@@ -1,0 +1,5 @@
+*.pyc
+*.ipynb
+
+# log stuff
+wandb/
