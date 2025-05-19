@@ -1,7 +1,7 @@
 """Custom schedulers.
 
 Adapted from UDTube:
-    
+
     https://github.com/CUNY-CL/udtube/blob/master/udtube/schedulers.py
 """
 

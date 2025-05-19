@@ -4,6 +4,9 @@ from torch import optim
 
 from . import schedulers
 
+# Default text encoding.
+ENCODING = "utf-8"
+
 # Data configuration arguments.
 SOURCE_COL = 1
 TARGET_COL = 2

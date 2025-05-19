@@ -1,7 +1,7 @@
 [project]
 name = "yoyodyne-pretrained"
-version = "0.0.1"
-description = "Small-vocabulary neural sequence-to-sequence models with warm start"
+version = "0.1.0"
+description = "Small-vocabulary transformer sequence-to-sequence models with warm starts"
 license = { text = "Apache 2.0" }
 readme = "README.md"
 requires-python = ">=3.10,<3.14"

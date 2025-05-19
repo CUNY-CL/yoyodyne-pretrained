@@ -4,6 +4,7 @@ import dataclasses
 import logging  # FIXME
 
 import transformers
+import torch
 
 from . import batches, tsv
 
@@ -17,17 +18,22 @@ class Collator:
 
     def __call__(self, itemlist: list[tsv.SampleType]) -> batches.Batch:
         source, target = zip(*itemlist)
-        source_tokenized = self._tokenize(source, self.source_tokenizer)
-        target_tokenized = (
-            self._tokenize(target, self.target_tokenizer) if target else None
-        )
-        return batches.Batch(source=source_tokenized, target=target_tokenized)
+        source_ids, source_mask = self._tokenize(source, self.source_tokenizer)
+        if target:
+            target_ids, target_mask = self._tokenize(
+                target, self.target_tokenizer
+            )
+            return batches.Batch(
+                source_ids, source_mask, target_ids, target_mask
+            )
+        else:
+            return batches.Batch(source_ids, source_mask)
 
     def _tokenize(
         self,
         itemlist: list[tuple[str, str]],
         tokenizer: transformers.AutoTokenizer,
-    ) -> batches.Tokenized:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         output = tokenizer(
             itemlist,
             padding="longest",
@@ -35,4 +41,5 @@ class Collator:
             return_tensors="pt",
             add_special_tokens=False,
         )
-        return batches.Tokenized(output.input_ids, output.attention_mask)
+        return output.input_ids, output.attention_mask
+        # FIXME: detect and handle overlong strings.

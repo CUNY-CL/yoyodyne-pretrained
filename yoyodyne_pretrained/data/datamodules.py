@@ -8,10 +8,6 @@ from .. import defaults
 from . import collators, datasets, tsv
 
 
-class Error(Exception):
-    pass
-
-
 class DataModule(lightning.LightningDataModule):
     """String pair data module.
 
@@ -69,13 +65,14 @@ class DataModule(lightning.LightningDataModule):
         self.decoder_tokenizer = transformers.AutoTokenizer.from_pretrained(
             decoder
         )
+        self.batch_size = batch_size
 
     # Required API.
 
     def train_dataloader(self) -> data.DataLoader:
         assert self.train is not None, "no train path"
         return data.DataLoader(
-            datasets.Dataset(self.train),
+            self._dataset(self.train),
             collate_fn=self._collate_fn,
             batch_size=self.batch_size,
             shuffle=True,
@@ -86,7 +83,7 @@ class DataModule(lightning.LightningDataModule):
     def val_dataloader(self) -> data.DataLoader:
         assert self.val is not None, "no val path"
         return data.DataLoader(
-            datasets.Dataset(self.val),
+            self._dataset(self.val),
             collate_fn=self._collate_fn,
             batch_size=self.batch_size,
             shuffle=False,
@@ -97,7 +94,7 @@ class DataModule(lightning.LightningDataModule):
     def predict_dataloader(self) -> data.DataLoader:
         assert self.predict is not None, "no predict path"
         return data.DataLoader(
-            datasets.Dataset(self.predict),
+            self._dataset(self.predict),
             collate_fn=self._collate_fn,
             batch_size=self.batch_size,
             shuffle=False,
@@ -108,7 +105,7 @@ class DataModule(lightning.LightningDataModule):
     def test_dataloader(self) -> data.DataLoader:
         assert self.test is not None, "no test path"
         return data.DataLoader(
-            datasets.Dataset(self.test),
+            self._dataset(self.test),
             collate_fn=self._collate_fn,
             batch_size=self.batch_size,
             shuffle=False,

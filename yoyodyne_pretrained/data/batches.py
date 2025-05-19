@@ -9,18 +9,6 @@ import torch
 from torch import nn
 
 
-class Tokenized(nn.Module):
-    """Stores input IDs and attention mask in a module."""
-
-    ids: torch.Tensor
-    mask: torch.Tensor
-
-    def __init__(self, ids, mask):
-        super().__init__()
-        self.register_buffer("ids", ids)
-        self.register_buffer("mask", mask)
-
-
 class Batch(nn.Module):
     """String data batch.
 
@@ -29,13 +17,17 @@ class Batch(nn.Module):
         target: optional tokenized target.
     """
 
-    source: Tokenized
-    target: Tokenized | None
+    source: torch.Tensor
+    source_mask: torch.Tensor
+    target: torch.Tensor | None
+    target_mask: torch.Tensor | None
 
-    def __init__(self, source, target=None):
+    def __init__(self, source, source_mask, target=None, target_mask=None):
         super().__init__()
         self.register_buffer("source", source)
+        self.register_buffer("source_mask", source_mask)
         self.register_buffer("target", target)
+        self.register_buffer("target_mask", target_mask)
 
     def __len__(self) -> int:
-        return self.source.ids.size(0)
+        return self.source.size(0)

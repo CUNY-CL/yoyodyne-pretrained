@@ -76,13 +76,10 @@ class TsvParser:
             source = self._get_string(row, self.source_col)
             if self.has_features:
                 features = self._get_string(row, self.features_col)
+                # Concatenates features after the source.
                 source = f"{source} {features}"
-                if self.has_target:
-                    target = self._get_string(row, self.target_col)
-                    return source, target
-                else:
-                    return source
-            elif self.has_target:
+            if self.has_target:
+                target = self._get_string(row, self.target_col)
                 yield source, target
             else:
                 yield source
