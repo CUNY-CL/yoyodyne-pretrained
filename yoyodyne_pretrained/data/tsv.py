@@ -83,6 +83,3 @@ class TsvParser:
                 yield source, target
             else:
                 yield source
-
-    # Deserialization methods.
-    # FIXME

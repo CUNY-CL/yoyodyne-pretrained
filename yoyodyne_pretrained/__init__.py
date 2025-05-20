@@ -9,6 +9,10 @@ import warnings
 # Silences tokenizers warning about forking.
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+
+warnings.filterwarnings(
+    "ignore", ".*to train encoder-decoder models by computing the loss.*"
+)
 warnings.filterwarnings(
     "ignore", ".*does not have many workers which may be a bottleneck.*"
 )

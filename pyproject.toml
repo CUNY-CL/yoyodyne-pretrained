@@ -44,7 +44,7 @@ homepage = "https://github.com/CUNY-CL/yoyodyne-pretrained"
 
 [tool.setuptools.packages.find]
 include = ["yoyodyne_pretrained*"]
-exclude = ["configs*", "examples*", "scripts*"]
+exclude = ["configs*", "examples*"]
 
 [project.scripts]
 yoyodyne_pretrained = "yoyodyne_pretrained.cli:main"

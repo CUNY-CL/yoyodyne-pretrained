@@ -9,7 +9,7 @@ import transformers
 from . import data, defaults, metrics
 
 
-class YoyodynePretrained(lightning.LightningModule):
+class PretrainedModel(lightning.LightningModule):
     """Yoyodyne pretrained model.
 
     This model consists of a pretrained encoder and decoder with randomly
@@ -31,8 +31,10 @@ class YoyodynePretrained(lightning.LightningModule):
 
     Args:
         dropout: Dropout probability.
+        label_smoothing: Label smoothing probability.
         encoder: Name of the Hugging Face encoder model.
         decoder: Name of the Hugging Face decoder model.
+        tie_encoder_decoder: Should we tie the two?
     """
 
     model: transformers.EncoderDecoderModel
@@ -40,44 +42,67 @@ class YoyodynePretrained(lightning.LightningModule):
     # TODO: update with new metrics as they become available.
     accuracy: metrics.Accuracy | None
     ser: metrics.SER | None
+    generation_config: transformers.GenerationConfig
     optimizer: optim.Optimizer
     scheduler: optim.lr_scheduler.LRScheduler
 
     def __init__(
         self,
         dropout=defaults.DROPOUT,
+        label_smoothing=defaults.LABEL_SMOOTHING,
         encoder=defaults.ENCODER,
         decoder=defaults.DECODER,
+        tie_encoder_decoder=defaults.TIE_ENCODER_DECODER,
         compute_accuracy=True,
         compute_ser=False,
         optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
         scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
     ):
         super().__init__()
+        # Needed for various attributes.
         self.model = (
             transformers.EncoderDecoderModel.from_encoder_decoder_pretrained(
                 encoder,
                 decoder,
-                encoder_hidden_dropout_prob=dropout,
-                decoder_hidden_dropout_prob=dropout,
+                tie_encoder_decoder=tie_encoder_decoder,
+                #encoder_hidden_dropout_prob=dropout,
+                #decoder_hidden_dropout_prob=dropout,
             )
         )
-        self.loss_func = nn.CrossEntropyLoss(ignore_index=0)
+        # Necessary patching for decoding.
+        decoder_tokenizer = transformers.AutoTokenizer.from_pretrained(decoder)
+        self.bos = decoder_tokenizer.cls_token_id
+        self.eos = decoder_tokenizer.sep_token_id
+        self.pad = decoder_tokenizer.pad_token_id
+        self.model.config.decoder_start_token_id = self.bos
+        self.model.config.bos_token_id = self.bos
+        self.model.config.eos_token_id = self.eos
+        self.model.config.pad_token_id = self.pad
+        target_vocab_size = (
+            self.model.get_decoder().get_output_embeddings().out_features
+        )
         self.accuracy = (
             metrics.Accuracy(
-                num_classes=self.model.get_output_embeddings().out_features
+                ignore_index=self.pad, num_classes=target_vocab_size
             )
             if compute_accuracy
             else None
         )
-        self.ser = metrics.SER() if compute_ser else None
+        self.ser = metrics.SER(self.eos) if compute_ser else None
+        # Actually initialized by configure_optimizers.
         self.optimizer = optimizer
         self.scheduler = scheduler
 
-    def configure_optimizers(self) -> dict:
+    def configure_optimizers(self) -> dict[str, ...]:
         optimizer = self.optimizer(self.model.parameters())
         scheduler = self.scheduler(optimizer)
-        return {"optimizer": optimizer, "lr_scheduler": scheduler}
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                **scheduler.config_dict(),
+            },
+        }
 
     # TODO: update with new metrics as they become available.
 
@@ -89,30 +114,31 @@ class YoyodynePretrained(lightning.LightningModule):
     def has_ser(self) -> bool:
         return self.ser is not None
 
-    def forward(self, batch: data.Batch) -> torch.Tensor:
+    def forward(self, batch: data.Batch) -> tuple[torch.Tensor, torch.Tensor]:
         output = self.model(
             input_ids=batch.source,
             attention_mask=batch.source_mask,
-            decoder_input_ids=batch.target,
-            decoder_attention_mask=batch.target_mask,
+            labels=batch.target,
         )
         # -> B x vocab_size x seq_length.
-        return output.logits.transpose(1, 2)
+        logits = output.logits.transpose(1, 2)
+        return logits, output.loss
 
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
-        logits = self(batch)
-        return torch.argmax(logits, dim=1)
+        # FIXME
+        return self._decode(batch.source, batch.source_mask)
 
     def training_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
-        logits = self(batch)
-        return self.loss_func(logits, batch.target)
+        _, loss = self(batch)
+        return loss
 
     def on_test_epoch_start(self) -> None:
         self._reset_metrics()
 
     def test_step(self, batch: data.Batch, batch_idx: int) -> None:
-        logits = self(batch)
-        self._update_metrics(logits, batch.target)
+        pass
+        # FIXME
+        # self._update_metrics(predictions, batch.target)
 
     def on_test_epoch_end(self) -> None:
         self._log_metrics_on_epoch_end("test")
@@ -121,8 +147,7 @@ class YoyodynePretrained(lightning.LightningModule):
         self._reset_metrics()
 
     def validation_step(self, batch: data.Batch, batch_idx: int) -> None:
-        logits = self(batch)
-        loss = self.loss_func(logits, batch.target)
+        _, loss = self(batch)
         self.log(
             "val_loss",
             loss,
@@ -131,7 +156,27 @@ class YoyodynePretrained(lightning.LightningModule):
             on_epoch=True,
             prog_bar=True,
         )
-        self._update_metrics(logits, batch.target)
+        predictions = self.model.generate(
+            batch.target,
+            generation_config=transformers.GenerationConfig(
+                bos_token_id=self.bos, 
+                eos_token_id=self.eos,
+                pad_token_id=self.pad,
+                early_stopping=True,
+                no_repeat_ngram_size=2,
+                num_beams=5
+            ),
+        )
+        decoder_tokenizer = transformers.AutoTokenizer.from_pretrained(
+            self.model.get_decoder().name_or_path
+        )
+        print(
+            decoder_tokenizer.batch_decode(
+                predictions, skip_special_tokens=True
+            )
+        )
+        print()
+        # self._update_metrics(predictions, batch.target)
 
     def on_validation_epoch_end(self) -> None:
         self._log_metrics_on_epoch_end("val")
@@ -144,13 +189,16 @@ class YoyodynePretrained(lightning.LightningModule):
             self.ser.reset()
 
     def _update_metrics(
-        self, logits: torch.Tensor, target: torch.Tensor
+        self, predictions: torch.Tensor, target: torch.Tensor
     ) -> None:
         # TODO: update with new metrics as they become available.
+        # TODO: this design assumes that at least one metric is enabled and
+        # does an unnecessary decode if all are disabled. Should we do
+        # anything to avoid this?
         if self.has_accuracy:
-            self.accuracy.update(logits, target)
+            self.accuracy.update(predictions, target)
         if self.has_ser:
-            self.ser.update(logits, target)
+            self.ser.update(predictions, target)
 
     def _log_metrics_on_epoch_end(self, subset: str) -> None:
         # TODO: update with new metrics as they become available.

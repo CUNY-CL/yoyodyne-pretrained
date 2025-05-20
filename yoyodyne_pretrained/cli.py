@@ -4,16 +4,16 @@ import logging
 
 from lightning.pytorch import callbacks as pytorch_callbacks, cli
 
-from . import data, models, trainers
-
-# FIXME callbacks.
+from . import callbacks, data, models, trainers
 
 
 def yoyodyne_pretrained_python_interface(args: cli.ArgsType = None):
     """Interface to use models through Python."""
     YoyodynePretrainedCLI(
-        models.YoyodynePretrained,
+        models.PretrainedModel,
         data.DataModule,
+        # Prevents prediction logits from accumulating in memory; see the
+        # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
         args=args,
     )
@@ -32,7 +32,10 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
             pytorch_callbacks.ModelCheckpoint,
             "checkpoint",
         )
-        # FIXME add callback.
+        parser.add_lightning_class_args(
+            callbacks.PredictionWriter,
+            "prediction",
+        )
 
 
 def main() -> None:
@@ -42,7 +45,7 @@ def main() -> None:
         level="INFO",
     )
     YoyodynePretrainedCLI(
-        models.YoyodynePretrained,
+        models.PretrainedModel,
         data.DataModule,
         # Prevents prediction logits from accumulating in memory; see the
         # documentation in `trainers.py` for more context.

@@ -1,7 +1,49 @@
-"""Validation metrics."""
+"""Validation metrics.
 
-# TODO: This will eventually be available in vanilla Yoyodyne; use that and
+The computation of loss is built into the models. A slight modification of
+a built-in class from torchmetrics is used to compute exact match accuracy. A
+novel symbol error rate (SER) implementation is also provided.
+
+Adding additional metrics is relatively easy, though there are a lot of steps.
+Suppose one wants to add a metric called Wham. Then one must:
+
+* Implement `Wham(torchmetrics.Metric)` in this module.
+* Add the following to the `BaseModel` in `model.py`:
+    - add `wham: metrics.Wham | None` to the member type declarations
+    - add `compute_wham=False` to the constructor's arguments
+    - add `self.wham = metric.Wham(...) if compute_wham else None` to the
+      body of the constructor
+    - add the following property:
+
+        @property
+        def has_wham(self) -> bool:
+            return self.wham is not None
+
+    - add the following to the body of `_reset_metrics`:
+
+        if self.has_wham:
+            self.wham.reset()
+
+    - add the following to the body of `_update_metrics`:
+
+        if self.has_wham:
+            self.wham.update(predictions, target)
+
+    - add the following to the body of `_log_metrics_on_epoch_end`:
+
+        if self.has_wham:
+            self.log(
+                f"{subset}_wham",
+                self.wham.compute(),
+                logger=True,
+                on_epoch=True,
+                prog_bar=True,
+            )
+"""
+
+# TODO: This will eventually be available from vanilla Yoyodyne; use that and
 # delete this once it is.
+
 
 import numpy
 import torch
@@ -12,11 +54,23 @@ class Error(Exception):
     pass
 
 
+# This maps metrics, as specified as command-line strings, onto three
+# pieces of data:
+#
+# * `filename` is an f-string template (note it is not an f-string literal)
+#   which is used when that metric is used for checkpointing.
+#   It includes the integer `epoch` and the value of `monitor` (see below)
+#   in the template.
+# * `mode` is either "max" or "min" and indicates whether we want to
+#   maximize or minimize the metric.
+# * `monitor` is the name of the metric with a `val_` prefix.
+
+
 class Accuracy(torchmetrics.classification.MulticlassExactMatch):
     """Exact match string accuracy ignoring padding symbols."""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, ignore_index=0, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class SER(torchmetrics.Metric):
@@ -46,8 +100,11 @@ class SER(torchmetrics.Metric):
     edit operations, but we rule this out for YAGNI reasons.
     """
 
-    def __init__(self, *args, **kwargs):
+    sep_token_id: int
+
+    def __init__(self, sep_token_id: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.sep_token_id = sep_token_id
         self.add_state("edits", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("length", default=torch.tensor(0), dist_reduce_fx="sum")
 
@@ -117,11 +174,11 @@ class SER(torchmetrics.Metric):
             gold (torch.Tensor): gold 1d tensor.
         """
         try:
-            gold_length = torch.nonzero(gold == 0)[0].item()
+            gold_length = torch.nonzero(gold == self.sep_token_id)[0].item()
         except IndexError:
             gold_length = gold.size(0)
         try:
-            hypo_length = torch.nonzero(hypo == 0)[0].item()
+            hypo_length = torch.nonzero(hypo == self.sep_token_id)[0].item()
         except IndexError:
             hypo_length = hypo.size(0)
         self.length += gold_length

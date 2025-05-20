@@ -5,7 +5,7 @@ This is adapted from UDTube:
     https://github.com/CUNY-CL/udtube/blob/master/udtube/trainers.py
 """
 
-# TODO: This will eventually be available in vanilla Yoyodyne; use that and
+# TODO: This will eventually be available from vanilla Yoyodyne; use that and
 # delete this once it is.
 
 

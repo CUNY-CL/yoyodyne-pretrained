@@ -1,10 +1,7 @@
 # Yoyodyne 🪀 Pre-trained
 
-```{=html}
-<!-- put badges here -->
-```
 Yoyodyne Pre-trained provides sequence-to-sequence transduction with pre-trained
-transformer modules and is based on [PyTorch](https://pytorch.org/),
+transformer modules. It is based on [PyTorch](https://pytorch.org/),
 [Lightning](https://lightning.ai/), and [Hugging Face
 transformers](https://huggingface.co/docs/transformers/en/index).
 
@@ -70,15 +67,28 @@ experiment.
 #### Model architecture
 
 Most of the details of the model architecture are determined by the choice of
-pre-trained encoder and decoder. By default, Yoyodyne Pre-trained uses
-multilingual cased BERT but has also been tested with XLM-roBERTa.
+pre-trained encoder and decoder, specified either as the names used on Hugging
+Face or a local path. By default, Yoyodyne Pre-trained uses multilingual cased
+BERT but has also been tested with XLM-RoBERTa.
+
+While it is possible to use separate encoder and decoder modules from separate
+sources, in practice it is usually wise to use the same model and furthermore to
+to tie their parameters, as in the following YAML snippet.
+
+    ...
+    model:
+      encoder:
+      encoder: google-bert/bert-base-multilingual-cased
+      decoder: google-bert/bert-base-multilingual-cased
+      tie_encoder_decoder: true
+      ...
 
 #### Optimization
 
 Yoyodyne Pre-trained requires an optimizer and an LR scheduler. The default
 optimizer is Adam and the default scheduler is
-`yoyodyne_pretrained.schedulers.DummyScheduler`, which keeps learning rate fixed
-at its initial value.
+`yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its
+initial value and takes no other arguments.
 
 #### Checkpointing
 
@@ -90,12 +100,13 @@ given below.
     ...
     checkpoint:
       filename: "model-{epoch:03d}-{val_loss:.4f}"
+      mode: min
       monitor: val_loss
       verbose: true
       ...
 
 Alternatively, one can specify a checkpointing that maximizes validation
-accuracy, as follows:
+accuracy, as follows.
 
     ...
     checkpoint:
@@ -105,8 +116,8 @@ accuracy, as follows:
       verbose: true
       ...
 
-Without some specification under `checkpoint:` Yoyodyne Pre-trained will not
-generate checkpoints!
+A checkpoint config must be specified or Yoyodyne Pre-trained will not generate
+any checkpoints.
 
 #### Callbacks
 
@@ -190,7 +201,14 @@ functionality requires a working account with Weights & Biases.
 
 #### Other options
 
-Dropout probability is specified using `model: dropout: ...`.
+Dropout probability and/or label smoothing are specified as arguments to the
+`model`, as shown in the following YAML snippet.
+
+    ...
+    model:
+      dropout: 0.5
+      label_smoothing: 0.1
+      ...
 
 Batch size is specified using `data: batch_size: ...` and defaults to 32.
 
@@ -243,6 +261,12 @@ written.
 This mode is invoked using the `predict` subcommand, like so:
 
     yoyodyne_pretrained predict --config path/to/config.yaml --ckpt_path path/to/checkpoint.ckpt
+
+**NB**: many tokenizers, including the BERT tokenizer, are lossy in the sense
+that they may introduce spaces not present in the input, particularly adjacent
+to word-internal punctuation like dashes (e.g., *state-of-the-art*).
+Unfortunately, there is little that can be done about this within this
+library, but it may be possible to fix this as a post-processing step.
 
 ## Examples
 
