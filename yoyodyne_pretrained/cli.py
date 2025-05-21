@@ -31,10 +31,12 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
         parser.add_lightning_class_args(
             pytorch_callbacks.ModelCheckpoint,
             "checkpoint",
+            required=False,
         )
         parser.add_lightning_class_args(
             callbacks.PredictionWriter,
             "prediction",
+            required=False,
         )
 
 

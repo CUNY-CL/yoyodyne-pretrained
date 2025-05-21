@@ -45,7 +45,6 @@ Suppose one wants to add a metric called Wham. Then one must:
 # delete this once it is.
 
 
-import numpy
 import torch
 import torchmetrics
 

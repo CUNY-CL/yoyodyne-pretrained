@@ -97,17 +97,14 @@ class PretrainedModel(lightning.LightningModule):
         # Actually initialized by configure_optimizers.
         self.optimizer = optimizer
         self.scheduler = scheduler
+        self.save_hyperparameters()
 
-    def configure_optimizers(self) -> dict[str, ...]:
+    def configure_optimizers(
+        self,
+    ) -> tuple[list[optim.Optimizer], list[optim.lr_scheduler.LRScheduler]]:
         optimizer = self.optimizer(self.model.parameters())
         scheduler = self.scheduler(optimizer)
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {
-                "scheduler": scheduler,
-                **scheduler.config_dict(),
-            },
-        }
+        return [optimizer], [scheduler]
 
     # TODO: update with new metrics as they become available.
 

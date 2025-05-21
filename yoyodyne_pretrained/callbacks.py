@@ -13,22 +13,22 @@ from . import data, models
 class PredictionWriter(callbacks.BasePredictionWriter):
     """Writes predictions in CoNLL-U format.
 
-    If path is not specified, stdout is used. If using this in conjunction
-    with > or |, add --trainer.enable_progress_bar false.
-
     Args:
         path: Path for the predictions file.
     """
 
     path: str
-    sink: TextIO
+    sink: TextIO | None
 
-    def __init__(
-        self,
-        path: str | None = None,  # If not filled in, stdout will be used.
-    ):
+    # path is given a default argument to silence a warning if no prediction
+    # callback is configured.
+    # TODO: remove default if this is addressed:
+    #
+    #   https://github.com/Lightning-AI/pytorch-lightning/issues/20851
+    def __init__(self, path: str = ""):
         super().__init__("batch")
         self.path = path
+        self.sink = None
 
     # Required API.
 

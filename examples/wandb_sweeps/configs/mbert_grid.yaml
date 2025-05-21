@@ -1,0 +1,37 @@
+method: random
+metric:
+  name: val_accuracy
+  goal: maximize
+parameters:
+  model.dropout:
+    distribution: uniform
+    min: 0
+    max: 0.5
+  model.label_smoothing:
+    distribution: uniform
+    min: 0
+    max: 0.2
+  model.encoder:
+    value: google-bert/bert-base-multilingual-cased 
+  model.decoder:
+    value: google-bert/bert-base-multilingual-cased 
+  model.tie_encoder_decoder:
+    value: true
+  model.optimizer.class_path:
+    value: torch.optim.Adam
+  model.optimizer.init_args.lr:
+    distribution: log_uniform_values
+    min: 1e-06
+    max: 0.001
+  model.scheduler.class_path:
+    value: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+  model.scheduler.init_args.warmup_epochs:
+    distribution: q_uniform
+    q: 1
+    min: 1
+    max: 10
+  data.batch_size:
+    distribution: q_uniform
+    q: 16
+    min: 16
+    max: 1024
