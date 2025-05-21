@@ -19,13 +19,15 @@ class Collator:
         encoding = self.source_tokenizer(
             source, padding="longest", return_tensors="pt"
         )
-        target_ids = (
-            self.target_tokenizer(
+        if target:
+            decoding = self.target_tokenizer(
                 target, padding="longest", return_tensors="pt"
-            ).input_ids
-            if target
-            else None
-        )
-        return batches.Batch(
-            encoding.input_ids, encoding.attention_mask, target_ids
-        )
+            )
+            return batches.Batch(
+                encoding.input_ids,
+                encoding.attention_mask,
+                decoding.input_ids,
+                decoding.attention_mask,
+            )
+        else:
+            return batches.Batch(encoding.input_ids, encoding.attention_mask)

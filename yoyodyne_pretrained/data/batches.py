@@ -14,19 +14,22 @@ class Batch(nn.Module):
 
     Args:
         source: tokenized source.
-        source_mask: tokenized source.
+        source_mask: source mask.
         target: optional tokenized target.
+        source_mask: optional target mask.
     """
 
     source: torch.Tensor
     source_mask: torch.Tensor
     target: torch.Tensor | None
+    target_mask: torch.Tensor | None
 
-    def __init__(self, source, source_mask, target=None):
+    def __init__(self, source, source_mask, target=None, target_mask=None):
         super().__init__()
         self.register_buffer("source", source)
-        self.register_buffer("source_mask", source)
+        self.register_buffer("source_mask", source_mask)
         self.register_buffer("target", target)
+        self.register_buffer("target_mask", target_mask)
 
     def __len__(self) -> int:
         return self.source.size(0)

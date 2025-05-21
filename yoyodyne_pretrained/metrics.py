@@ -72,46 +72,10 @@ class Accuracy(torchmetrics.classification.MulticlassExactMatch):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
-class SER(torchmetrics.Metric):
-    r"""Defines a symbol error rate metric.
-
-    Symbol error rate is essentially minimum edit distance, in "symbols" (not
-    characters, as in the `torchmetrics.text` module) scaled by the length
-    of the gold hypotheses. Theoretically its range is $[0, \infty]$ but in
-    practice it is usually in [0, 1]; smaller is better.
-
-    Some definitions multiple this by 100; we don't bother here.
-
-    We assume tensors of shape B x seq_len as input. For reasons documented
-    below, seq_len must be $< 2^16$.
-
-    This is intended to be a corpus-level statistic, so the number of edits and
-    the lengths of strings are stored separately and are only combined as
-    needed.
-
-    It is not obvious whether the dynamic programming table ought to be stored
-    on CPU, using a Numpy array, or in a 2d tensor on the accelerator. Since
-    there is no need to track gradients and since it is accessed in a way that
-    is likely to make good use of a CPU cache, the current implementation
-    assumes the former, but this can be re-evaluated in light of profiling.
-
-    One can imagine imposing different user-specified costs for the different
-    edit operations, but we rule this out for YAGNI reasons.
-    """
-
-    sep_token_id: int
-
-    def __init__(self, sep_token_id: int, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.sep_token_id = sep_token_id
-        self.add_state("edits", default=torch.tensor(0), dist_reduce_fx="sum")
-        self.add_state("length", default=torch.tensor(0), dist_reduce_fx="sum")
-
     def update(self, hypo: torch.Tensor, gold: torch.Tensor) -> None:
-        """Accumulates edit distance sufficient statistics for a batch.
+        """Accumulates accuracy sufficient statistics for a batch.
 
-        This also performs all the necessary data validation work:
+        This also performs all the necessary data validation work.
 
         Args:
             hypo (torch.Tensor): a tensor of hypothesis data of shape
@@ -136,71 +100,9 @@ class SER(torchmetrics.Metric):
                 "Hypothesis and gold batch sizes do not match "
                 f"({gold.size(0)} != {hypo.size(0)})"
             )
-        # uint16 is used for the dynamic programming table, so this
-        # implementation is not necessarily correct for strings longer than
-        # $2^16 = 65536$. This is not much of a limitation in practice because
-        # quadratic growth makes the computation infeasible at that length
-        # anyways. This checks the length of the second dimension to ensure it
-        # does not exceed this length.
-        max_size = numpy.iinfo(numpy.uint16).max
-        if hypo.size(-1) > max_size:
-            raise Error(
-                "Hypothesis string lengths exceeds precision "
-                f"({hypo.size(-1)} > {max_size})"
-            )
-        if gold.size(-1) > max_size:
-            raise Error(
-                "Gold string lengths exceeds precision "
-                f"({gold.size(-1)} > {max_size})"
-            )
-        # Iterates over every element in batch.
-        for hypo_row, gold_row in zip(hypo, gold):
-            self._row_edit_distance(hypo_row, gold_row)
-
-    def _row_edit_distance(
-        self,
-        hypo: torch.Tensor,
-        gold: torch.Tensor,
-    ) -> None:
-        """Computes edit distance sufficient statistics for single tensors.
-
-        This makes the following assumptions about the input tensors:
-
-        * They are 1d and can be interpreted as single strings.
-        * Padding is denoted by 0.
-
-        Args:
-            hypo (torch.Tensor): hypothesis 1d tensor.
-            gold (torch.Tensor): gold 1d tensor.
-        """
-        try:
-            gold_length = torch.nonzero(gold == self.sep_token_id)[0].item()
-        except IndexError:
-            gold_length = gold.size(0)
-        try:
-            hypo_length = torch.nonzero(hypo == self.sep_token_id)[0].item()
-        except IndexError:
-            hypo_length = hypo.size(0)
-        self.length += gold_length
-        table = numpy.zeros(
-            (hypo_length + 1, gold_length + 1), dtype=numpy.uint16
-        )
-        table[:, 0] = range(hypo_length + 1)
-        table[0, :] = range(gold_length + 1)
-        for i in range(1, hypo_length + 1):
-            for j in range(1, gold_length + 1):
-                if hypo[i - 1] == gold[j - 1]:
-                    table[i, j] = table[i - 1, j - 1]
-                else:
-                    table[i, j] = (
-                        min(
-                            table[i - 1, j],
-                            table[i, j - 1],
-                            table[i - 1, j - 1],
-                        )
-                        + 1
-                    )
-        self.edits += table[-1, -1]
-
-    def compute(self) -> torch.Tensor:
-        return self.edits / self.length
+        # Shrink to the smaller of the two. It won't match anyways.
+        if hypo.size(1) < gold.size(1):
+            gold = gold[:, : hypo.size(1)]
+        elif hypo.size(1) > gold.size(1):
+            hypo = hypo[:, : gold.size(1)]
+        super().update(hypo, gold)

@@ -9,7 +9,10 @@ import warnings
 # Silences tokenizers warning about forking.
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-
+warnings.filterwarnings(
+    "ignore",
+    ".*To copy construct from a tensor.*",
+)
 warnings.filterwarnings(
     "ignore", ".*to train encoder-decoder models by computing the loss.*"
 )

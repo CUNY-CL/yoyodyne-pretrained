@@ -17,6 +17,9 @@ BATCH_SIZE = 32
 DROPOUT = 0.5
 LABEL_SMOOTHING = 0.0
 
+# Decoding arguments.
+NUM_BEAMS = 5
+
 # Architecture arguments.
 DECODER = "google-bert/bert-base-multilingual-cased"
 ENCODER = "google-bert/bert-base-multilingual-cased"

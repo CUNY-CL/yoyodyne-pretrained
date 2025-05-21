@@ -32,10 +32,9 @@ To install Yoyodyne Pre-trained and its dependencies, run the following command:
 
 ## File formats
 
-Othjer than YAML configuration files, Yoyodyne Pre-trained operates on basic
-tab-separated values (TSV) files. The user can specify source, features, and
-target columns. If a feature column is specified, it is concatenated (with a
-separating space) to the source.
+Other than YAML configuration files, Yoyodyne Pre-trained operates on basic
+tab-separated values (TSV) data files. The user can specify source, features,
+and target columns. If a feature column is specified, it is concatenated (with a separating space) to the source.
 
 ## Usage
 
@@ -69,7 +68,7 @@ experiment.
 Most of the details of the model architecture are determined by the choice of
 pre-trained encoder and decoder, specified either as the names used on Hugging
 Face or a local path. By default, Yoyodyne Pre-trained uses multilingual cased
-BERT but has also been tested with XLM-RoBERTa.
+BERT modules but has also been tested with XLM-RoBERTa.
 
 While it is possible to use separate encoder and decoder modules from separate
 sources, in practice it is usually wise to use the same model and furthermore to
@@ -99,20 +98,20 @@ given below.
 
     ...
     checkpoint:
-      filename: "model-{epoch:03d}-{val_loss:.4f}"
-      mode: min
-      monitor: val_loss
-      verbose: true
-      ...
-
-Alternatively, one can specify a checkpointing that maximizes validation
-accuracy, as follows.
-
-    ...
-    checkpoint:
       filename: "model-{epoch:03d}-{val_accuracy:.4f}"
       mode: max
       monitor: val_accuracy
+      verbose: true
+      ...
+
+Alternatively, one can specify a checkpointing that minimizes validation
+loss as follows.
+
+    ...
+    checkpoint:
+      filename: "model-{epoch:03d}-{val_loss:.4f}"
+      mode: min
+      monitor: val_loss
       verbose: true
       ...
 
@@ -209,6 +208,9 @@ Dropout probability and/or label smoothing are specified as arguments to the
       dropout: 0.5
       label_smoothing: 0.1
       ...
+
+Decoding is performed with beam search if `model: num_beams: ...` is set to a
+value greater than 1; the beam width ("number of beams") defaults to 5.
 
 Batch size is specified using `data: batch_size: ...` and defaults to 32.
 
