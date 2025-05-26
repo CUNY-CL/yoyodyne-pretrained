@@ -1,0 +1,51 @@
+seed_everything: 1985
+trainer:
+  gradient_clip_val: 3
+  max_epochs: 100
+  max_time: 00:06:00:00
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: epoch
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val_loss
+        patience: 10
+        verbose: true
+  logger:
+    - class_path: lightning.pytorch.loggers.CSVLogger
+      init_args:
+        save_dir: /Users/Shinji/mbert/models
+    - class_path: lightning.pytorch.loggers.WandbLogger
+      init_args:
+        project: unit1
+        save_dir: /Users/Shinji/mbert/models
+
+model:
+  decoder: google-bert/bert-base-multilingual-cased
+  dropout: 0.4093681744748403
+  encoder: google-bert/bert-base-multilingual-cased
+  label_smoothing: 0.14915316576243975
+  optimizer:
+    class_path: torch.optim.Adam
+    init_args:
+      lr: 3.5137129343414837e-05
+  scheduler:
+    class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+    init_args:
+      warmup_epochs: 2
+  tie_encoder_decoder: false
+data:
+  batch_size: 32
+  features_col: 3
+  train: /Users/Shinji/conll2017/data/english-train-medium
+  val: /Users/Shinji/conll2017/data/english-train-medium
+  test: /Users/Shinji/conll2017/data/english-uncovered-test
+  predict: /Users/Shinji/conll2017/data/english-uncovered-test
+checkpoint:
+  filename: "model-{epoch:03d}-{val_accuracy:.4f}"
+  mode: max
+  monitor: val_accuracy
+  verbose: true
+prediction:
+  path: /Users/Shinji/conll2017/data/english-predicted-test

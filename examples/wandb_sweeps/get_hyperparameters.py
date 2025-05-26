@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Retrieves hyperparameters from a W&B sweep."""
+"""Retrieves hyperparameters from a W&B run."""
 
 import argparse
 import logging
@@ -9,7 +9,7 @@ import yaml
 
 import util
 
-# Top-level categories allowed in Lightning CLI configs
+# Top-level categories allowed in Lightning CLI configs.
 ALLOWED_TOP_LEVEL_CATEGORIES = frozenset(
     ["data", "model", "trainer", "checkpoint", "prediction"]
 )
@@ -39,13 +39,12 @@ def dot_to_nested_dict(flat_dict: dict[str, ...]) -> dict[str, ...]:
 
 def main(args: argparse.Namespace) -> None:
     api = wandb.Api()
-    sweep = api.sweep(f"{args.entity}/{args.project}/{args.sweep_id}")
-    best_run = sweep.best_run()
-    logging.info("Best run URL: %s", best_run.url)
-    # Gets all config values from best run.
+    run = api.run(f"{args.run_path}")
+    logging.info("Run URL: %s", run.url)
+    # Gets all config values from this run.
     flat_config = {
         key: value
-        for key, value in sorted(best_run.config.items())
+        for key, value in sorted(run.config.items())
         if value is not None and "/" not in key
     }
     # Converts to nested dictionary structure.
@@ -57,12 +56,7 @@ if __name__ == "__main__":
     logging.basicConfig(format="%(levelname)s: %(message)s", level="INFO")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--entity",
-        required=True,
-        help="The entity scope for the project.",
+        "run_path",
+        help="Run path (in the form entity/project/run_id)"
     )
-    parser.add_argument(
-        "--project", required=True, help="The project of the sweep."
-    )
-    parser.add_argument("--sweep_id", required=True, help="ID for the sweep.")
     main(parser.parse_args())

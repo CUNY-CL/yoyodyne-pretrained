@@ -1,6 +1,6 @@
 [project]
 name = "yoyodyne-pretrained"
-version = "0.0.2"
+version = "0.1.0"
 description = "Small-vocabulary transformer sequence-to-sequence models with warm starts"
 license = { text = "Apache 2.0" }
 readme = "README.md"
@@ -33,7 +33,7 @@ dependencies = [
     "transformers>=4.44.0,<5.0.0",
     "torch>=2.4.0,<3.0.0",
     "torchmetrics>=1.4.0.post0,<2.0.0",
-    "wandb>=0.18.0,<1.0.0",
+    "wandb>=0.18.0,<0.19.0",
 ]
 [build-system]
 requires = ["setuptools >= 72.1.0", "wheel"]

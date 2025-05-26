@@ -14,11 +14,12 @@ trainer:
   logger:
     - class_path: lightning.pytorch.loggers.CSVLogger
       init_args:
-        save_dir: /home/kbg/mbert/models
+        save_dir: /Users/Shinji/mbert/models
     - class_path: lightning.pytorch.loggers.WandbLogger
       init_args:
-        project: yoyodyne-pretrained
-        save_dir: /home/kbg/mbert/models
+        project: unit1
+        save_dir: /Users/Shinji/mbert/models
 data:
-  train: /home/kbg/conll2017/english-train-high
-  val: /home/kbg/conll2017/english-dev
+  features_col: 3
+  train: /Users/Shinji/conll2017/english-train-high
+  val: /Users/Shinji/conll2017/english-dev
