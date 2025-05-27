@@ -1,7 +1,12 @@
 # Yoyodyne 🪀 Pre-trained
 
+[![PyPI version](https://badge.fury.io/py/yoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
+[![Suported Python versions](https://img.shields.io/pypi/pyversionsyoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
+
 Yoyodyne Pre-trained provides sequence-to-sequence transduction with pre-trained
-transformer modules. It is based on [PyTorch](https://pytorch.org/),
+transformer modules.
+
+These models are implemented using [PyTorch](https://pytorch.org/),
 [Lightning](https://lightning.ai/), and [Hugging Face
 transformers](https://huggingface.co/docs/transformers/en/index).
 

@@ -54,7 +54,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    @parameterized.expand([("en",), ("ru",)])
+    @parameterized.expand(["en", "ru"])
     def test_model(self, langcode: str):
         # Fits model.
         train_path = os.path.join(TESTDATA_DIR, f"{langcode}_train.tsv")
