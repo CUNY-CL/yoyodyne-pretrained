@@ -34,7 +34,8 @@ To install Yoyodyne Pre-trained and its dependencies, run the following command:
 
 Other than YAML configuration files, Yoyodyne Pre-trained operates on basic
 tab-separated values (TSV) data files. The user can specify source, features,
-and target columns. If a feature column is specified, it is concatenated (with a separating space) to the source.
+and target columns. If a feature column is specified, it is concatenated (with a
+separating space) to the source.
 
 ## Usage
 
@@ -104,8 +105,8 @@ given below.
       verbose: true
       ...
 
-Alternatively, one can specify a checkpointing that minimizes validation
-loss as follows.
+Alternatively, one can specify a checkpointing that minimizes validation loss as
+follows.
 
     ...
     checkpoint:
@@ -267,13 +268,23 @@ This mode is invoked using the `predict` subcommand, like so:
 **NB**: many tokenizers, including the BERT tokenizer, are lossy in the sense
 that they may introduce spaces not present in the input, particularly adjacent
 to word-internal punctuation like dashes (e.g., *state-of-the-art*).
-Unfortunately, there is little that can be done about this within this
-library, but it may be possible to fix this as a post-processing step.
+Unfortunately, there is little that can be done about this within this library,
+but it may be possible to fix this as a post-processing step.
 
 ## Examples
 
 See [`examples`](examples/README.md) for some worked examples including
 hyperparameter sweeping with [Weights & Biases](https://wandb.ai/site).
+
+## Testing
+
+Given the size of the models, a basic integration test of Yoyodyne Pre-trained
+exceeds what is feasible without access to reasonably powerful GPU. Thus tests
+have to be run locally rather than via cloud-based continuous integration
+systems. The integration tests take roughly 30 minutes in total. To test the
+system, run the following:
+
+    pytest -vvv tests
 
 ### License
 
