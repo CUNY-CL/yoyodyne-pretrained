@@ -19,6 +19,7 @@ class PredictionWriter(callbacks.BasePredictionWriter):
 
     path: str
     sink: TextIO | None
+    tokenizer: transformers.AutoTokenizer | None
 
     # path is given a default argument to silence a warning if no prediction
     # callback is configured.
@@ -29,6 +30,7 @@ class PredictionWriter(callbacks.BasePredictionWriter):
         super().__init__("batch")
         self.path = path
         self.sink = None
+        self.tokenizer = None
 
     # Required API.
 
@@ -39,23 +41,21 @@ class PredictionWriter(callbacks.BasePredictionWriter):
         # where a prediction callback was specified but this is not running
         # in predict mode.
         self.sink = open(self.path, "w")
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+            pl_module.hparams.model_name
+        )
 
     def write_on_batch_end(
         self,
         trainer: trainer.Trainer,
-        model: models.PretrainedModel,
+        model: models.BaseModel,
         predictions: torch.Tensor,
         batch_indices: Sequence[int] | None,
         batch: data.Batch,
         batch_idx: int,
         dataloader_idx: int,
     ) -> None:
-        # TODO: It would be nice to persist this across batches but I'm not
-        # sure how.
-        tokenizer = transformers.AutoTokenizer.from_pretrained(
-            model.model.get_decoder().name_or_path
-        )
-        for prediction in tokenizer.batch_decode(
+        for prediction in self.tokenizer.batch_decode(
             predictions,
             skip_special_tokens=True,
         ):

@@ -3,29 +3,29 @@ metric:
   name: val_accuracy
   goal: maximize
 parameters:
-  model.dropout:
+  model.class_path:
+    value: yoyodyne_pretrained.models.EncoderDecoderModel
+  model.init_args.dropout:
     distribution: uniform
     min: 0
     max: 0.5
-  model.label_smoothing:
+  model.init_args.label_smoothing:
     distribution: uniform
     min: 0
     max: 0.2
-  model.encoder:
+  model.init_args.model_name:
     value: google-bert/bert-base-multilingual-cased 
-  model.decoder:
-    value: google-bert/bert-base-multilingual-cased 
-  model.tie_encoder_decoder:
+  model.init_args.tie_encoder_decoder:
     value: true
-  model.optimizer.class_path:
+  model.init_args.optimizer.class_path:
     value: torch.optim.Adam
-  model.optimizer.init_args.lr:
+  model.init_args.optimizer.init_args.lr:
     distribution: log_uniform_values
     min: 1e-06
     max: 0.001
-  model.scheduler.class_path:
+  model.init_args.scheduler.class_path:
     value: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
-  model.scheduler.init_args.warmup_epochs:
+  model.init_args.scheduler.init_args.warmup_epochs:
     distribution: q_uniform
     q: 1
     min: 1

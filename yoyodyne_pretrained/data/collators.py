@@ -11,16 +11,15 @@ from . import batches, tsv
 class Collator:
     """Collator for text data."""
 
-    source_tokenizer: transformers.AutoTokenizer
-    target_tokenizer: transformers.AutoTokenizer | None
+    tokenizer: transformers.AutoTokenizer
 
     def __call__(self, itemlist: list[tsv.SampleType]) -> batches.Batch:
         source, target = zip(*itemlist)
-        encoding = self.source_tokenizer(
+        encoding = self.tokenizer(
             source, padding="longest", return_tensors="pt"
         )
         if target:
-            decoding = self.target_tokenizer(
+            decoding = self.tokenizer(
                 target, padding="longest", return_tensors="pt"
             )
             return batches.Batch(

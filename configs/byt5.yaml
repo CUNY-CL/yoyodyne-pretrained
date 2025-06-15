@@ -20,13 +20,12 @@ trainer:
       init_args:
         project: unit1
         save_dir: /Users/Shinji/mbert/models
-
 model:
-  class_path: yoyodyne_pretrained.models.EncoderDecoderModel 
+  class_path: yoyodyne_pretrained.models.T5Model
   init_args:
     dropout: 0.4093681744748403
     label_smoothing: 0.14915316576243975
-    model_name: google-bert/bert-base-multilingual-cased
+    model_name: google/byt5-base
     optimizer:
       class_path: torch.optim.Adam
       init_args:
@@ -35,9 +34,8 @@ model:
       class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
       init_args:
         warmup_epochs: 2
-    tie_encoder_decoder: false
 data:
-  batch_size: 32
+  batch_size: 448
   features_col: 3
   train: /Users/Shinji/conll2017/data/english-train-medium
   val: /Users/Shinji/conll2017/data/english-train-medium

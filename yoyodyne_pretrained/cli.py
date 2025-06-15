@@ -12,6 +12,7 @@ def yoyodyne_pretrained_python_interface(args: cli.ArgsType = None):
     YoyodynePretrainedCLI(
         models.PretrainedModel,
         data.DataModule,
+        subclass_mode_model=True,
         # Prevents prediction logits from accumulating in memory; see the
         # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
@@ -38,6 +39,7 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
             "prediction",
             required=False,
         )
+        parser.link_arguments("model.init_args.model_name", "data.model_name")
 
 
 def main() -> None:
@@ -46,9 +48,11 @@ def main() -> None:
         datefmt="%d-%b-%y %H:%M:%S",
         level="INFO",
     )
+    # Select the model.
     YoyodynePretrainedCLI(
-        models.PretrainedModel,
-        data.DataModule,
+        model_class=models.BaseModel,
+        datamodule_class=data.DataModule,
+        subclass_mode_model=True,
         # Prevents prediction logits from accumulating in memory; see the
         # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
