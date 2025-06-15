@@ -15,13 +15,16 @@ transformers](https://huggingface.co/docs/transformers/en/index).
 ## Philosophy
 
 Yoyodyne Pre-trained inherits many of the same features as Yoyodyne itself, but
-the only supported architecture consists of a pre-trained transformer encoder
-and a pre-trained transformer decoder with a randomly-initialized
-cross-attention (à la Rothe et al. 2020). Because these modules are pre-trained,
-there are few architectural hyperparameters to set once one has determined which
-encoder and decoder to warm-start from. To keep Yoyodyne as simple as possible,
-Yoyodyne Pre-trained is a separate library though it has many of the same
-features and interfaces.
+limits itself to two types of pre-trained transformers:
+
+-   a pre-trained transformer encoder and a pre-trained transformer decoder with
+    a randomly-initialized cross-attention (à la Rothe et al. 2020)
+-   a T5 model
+
+Because these modules are pre-trained, there are few architectural
+hyperparameters to set once one has determined which encoder and decoder to
+warm-start from. To keep Yoyodyne as simple as possible, Yoyodyne Pre-trained is
+a separate library though it has many of the same features and interfaces.
 
 ## Installation
 
@@ -73,22 +76,28 @@ experiment.
 
 #### Model architecture
 
-Most of the details of the model architecture are determined by the choice of
-pre-trained encoder and decoder, specified either as the names used on Hugging
-Face or a local path. By default, Yoyodyne Pre-trained uses multilingual cased
-BERT modules but has also been tested with XLM-RoBERTa.
+##### Encoder-decoder models
 
-While it is possible to use separate encoder and decoder modules from separate
-sources, in practice it is usually wise to use the same model and furthermore to
-to tie their parameters, as in the following YAML snippet.
+In practice it is usually wise to tie the encoder and decoder parameters, as in
+the following YAML snippet:
 
     ...
     model:
-      encoder:
-      encoder: google-bert/bert-base-multilingual-cased
-      decoder: google-bert/bert-base-multilingual-cased
-      tie_encoder_decoder: true
-      ...
+      class_path: yoyodyne_pretrained.models.EncoderDecoderModel
+      init_args:
+        model_name: google-bert/bert-base-multilingual-cased
+        tie_encoder_decoder: true
+        ...
+
+##### T5 models
+
+The following snippet shows a simple configuration T5 configuration using ByT5:
+
+      class_path: yoyodyne_pretrained.models.T5Model
+      init_args:
+        model_name: google/byt5-base
+        tie_encoder_decoder: true
+        ...
 
 #### Optimization
 

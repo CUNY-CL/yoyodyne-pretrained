@@ -12,6 +12,7 @@ class DataModule(lightning.LightningDataModule):
     """String pair data module.
 
     Args:
+        model_name: Full name of a Hugging Face model; filled in by linking.
         predict: Path to a TSV file for prediction.
         test: Path to a TSV file for testing.
         train: Path to a TSV file for training.
@@ -19,8 +20,6 @@ class DataModule(lightning.LightningDataModule):
         source_col: 1-indexed column in TSV containing source strings.
         features_col: 1-indexed column in TSV containing features strings.
         target_col: 1-indexed column in TSV containing target strings.
-        encoder: Full name of a Hugging Face encoder.
-        decoder: Full name of a Hugging Face decoder.
         batch_size: Batch size.
     """
 
@@ -28,14 +27,14 @@ class DataModule(lightning.LightningDataModule):
     test: str | None
     train: str | None
     val: str | None
-
-    encoder_tokenizer: transformers.AutoTokenizer
-    decoder_tokenizer: transformers.AutoTokenizer
+    batch_size: int
+    tokenizer: transformers.AutoTokenizer
 
     def __init__(
         self,
-        # Paths.
         *,
+        model_name: str,
+        # Paths.
         train=None,
         val=None,
         predict=None,
@@ -45,8 +44,6 @@ class DataModule(lightning.LightningDataModule):
         features_col: int = defaults.FEATURES_COL,
         target_col: int = defaults.TARGET_COL,
         # Other.
-        encoder: str = defaults.ENCODER,
-        decoder: str = defaults.DECODER,
         batch_size: int = defaults.BATCH_SIZE,
     ):
         super().__init__()
@@ -59,13 +56,8 @@ class DataModule(lightning.LightningDataModule):
             features_col=features_col,
             target_col=target_col,
         )
-        self.encoder_tokenizer = transformers.AutoTokenizer.from_pretrained(
-            encoder
-        )
-        self.decoder_tokenizer = transformers.AutoTokenizer.from_pretrained(
-            decoder
-        )
         self.batch_size = batch_size
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
 
     # Required API.
 
@@ -120,7 +112,4 @@ class DataModule(lightning.LightningDataModule):
 
     @property
     def _collate_fn(self) -> collators.Collator:
-        return collators.Collator(
-            self.encoder_tokenizer,
-            self.decoder_tokenizer,
-        )
+        return collators.Collator(self.tokenizer)
