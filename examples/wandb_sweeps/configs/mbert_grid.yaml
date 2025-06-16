@@ -21,7 +21,7 @@ parameters:
     value: torch.optim.Adam
   model.optimizer.init_args.lr:
     distribution: log_uniform_values
-    min: 1e-06
+    min: 1.0e-06
     max: 0.001
   model.scheduler.class_path:
     value: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
