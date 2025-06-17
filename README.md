@@ -4,6 +4,7 @@
 version](https://badge.fury.io/py/yoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
 [![Suported Python
 versions](https://img.shields.io/pypi/pyversions/yoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/CUNY-CL/yoyodyne-pretrained/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/CUNY-CL/yoyodyne-pretrained/tree/master)
 
 Yoyodyne Pre-trained provides sequence-to-sequence transduction with pre-trained
 transformer modules.

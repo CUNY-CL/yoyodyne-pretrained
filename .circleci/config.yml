@@ -34,6 +34,7 @@ jobs:
       - run:
           name: Show installed Python packages
           command: pip list -v
+      # A test would go if we had one that could run on CircleCI.
 workflows:
   version: 2
   build:
