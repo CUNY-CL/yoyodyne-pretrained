@@ -137,7 +137,7 @@ class EncoderDecoderModel(BaseModel):
         model_name="google-bert/bert-base-multilingual-cased",
         dropout=defaults.DROPOUT,
         label_smoothing=defaults.LABEL_SMOOTHING,
-        tie_encoder_decoder=defaults.TIE_ENCODER_DECODER,
+        tie_encoder_decoder=True,
         num_beams=defaults.NUM_BEAMS,
         compute_accuracy=True,
         optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
@@ -239,7 +239,7 @@ class T5Model(BaseModel):
         self.scheduler = scheduler
         self.save_hyperparameters()
 
-    # Overrides to discard the leading BOS in the POS. Thsi is harmless for
+    # Overrides to discard the leading BOS in the POS. This is harmless for
     # prediction.
 
     def _decode(
