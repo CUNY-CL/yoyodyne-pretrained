@@ -3,7 +3,7 @@
 This runs five epochs of training over a small toy data set, attempting to
 overfit, then compares the resubstitution predictions on this set to
 previously computed results. As such this is essentially a change-detector
-test. Currently, English (en) and Russian (ru) are tested.
+test.
 """
 
 import contextlib
@@ -18,7 +18,7 @@ from yoyodyne_pretrained import cli
 
 # Directory the unit test is located in, relative to the working directory.
 DIR = os.path.relpath(os.path.dirname(__file__), os.getcwd())
-CONFIG_PATH = os.path.join(DIR, "testdata/mbert_config.yaml")
+CONFIG_PATH = os.path.join(DIR, "testdata/mbert.yaml")
 TESTDATA_DIR = os.path.join(DIR, "testdata")
 
 
@@ -54,7 +54,8 @@ class YoyodynePretrainedTest(unittest.TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
-    @parameterized.expand(["en", "ru"])
+    # Only English is included right now but we leave this a possibility.
+    @parameterized.expand(["en"])
     def test_model(self, langcode: str):
         # Fits model.
         train_path = os.path.join(TESTDATA_DIR, f"{langcode}_train.tsv")

@@ -28,10 +28,11 @@ Execute the following to create and run the sweep; here `${ENTITY}` and
 
 In the following example, targeting the English data for the CoNLL-SIGMORPHON
 2017 shared task on morphological generation, we have two separate YAML
-configuration files prepared. The first,
+configuration files prepared. The first file,
 [`configs/mbert_grid.yaml`](configs/mbert_grid.yaml), specifies the
-hyperparameter grid (it may also contain constant values, if desired), and the
-second, [`configs/mbert_tune.yaml`](configs/mbert_tune.yaml), specifies any
+hyperparameter grid (it may also contain constant values, if desired). A similar
+file ([`configs/byt5_grid.yaml`](configs/byt5_grid.yaml)) is available for ByT5.
+The second file, [`configs/tune.yaml`](configs/tune.yaml), specifies any
 constants needed during the sweep, such as trainer arguments or data paths.
 
     # Creates a sweep; save the sweep ID as ${SWEEP_ID} for later.
@@ -46,7 +47,7 @@ constants needed during the sweep, such as trainer arguments or data paths.
          --project "${PROJECT}" \
          --sweep_id "${SWEEP_ID}" \
          --count "${COUNT}" \
-         --config config/mbert_tune.yaml
+         --config config/tune.yaml
 
 Then, one can retrieve the results as follows:
 
@@ -59,6 +60,7 @@ Then, one can retrieve the results as follows:
 3.  Click on the downward arrow link, select "CSV Export", then click "Save as
     CSV".
 
-Or, to get the hyperparameters for a particular run, copy the "Run path" from the run's "Overview" on W&B, and then run:
+Or, to get the hyperparameters for a particular run, copy the "Run path" from
+the run's "Overview" on W&B, and then run:
 
     ./get_hyperparameters.py "${RUN_PATH}"

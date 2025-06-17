@@ -10,7 +10,7 @@ from . import callbacks, data, models, trainers
 def yoyodyne_pretrained_python_interface(args: cli.ArgsType = None):
     """Interface to use models through Python."""
     YoyodynePretrainedCLI(
-        models.PretrainedModel,
+        models.BaseModel,
         data.DataModule,
         subclass_mode_model=True,
         # Prevents prediction logits from accumulating in memory; see the
