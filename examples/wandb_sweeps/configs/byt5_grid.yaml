@@ -14,14 +14,12 @@ parameters:
     min: 0
     max: 0.2
   model.init_args.model_name:
-    value: google-bert/bert-base-multilingual-cased 
-  model.init_args.tie_encoder_decoder:
-    value: true
+    value: google/byt5-small
   model.init_args.optimizer.class_path:
     value: torch.optim.Adam
   model.init_args.optimizer.init_args.lr:
     distribution: log_uniform_values
-    min: 1.0e-06
+    min: 1e-06
     max: 0.001
   model.init_args.scheduler.class_path:
     value: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot

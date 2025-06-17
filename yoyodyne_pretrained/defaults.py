@@ -20,11 +20,6 @@ LABEL_SMOOTHING = 0.0
 # Decoding arguments.
 NUM_BEAMS = 5
 
-# Architecture arguments.
-DECODER = "google-bert/bert-base-multilingual-cased"
-ENCODER = "google-bert/bert-base-multilingual-cased"
-TIE_ENCODER_DECODER = True
-
 # Optimizer options.
 OPTIMIZER = optim.Adam
 SCHEDULER = schedulers.Dummy

@@ -1,0 +1,25 @@
+seed_everything: 42
+trainer:
+  gradient_clip_val: 3
+  enable_progress_bar: false
+  max_epochs: 5
+checkpoint:
+  mode: max
+  monitor: val_accuracy
+  save_last: true
+data:
+  batch_size: 10  # 100 batches per epoch.
+  features_col: 3
+model:
+  class_path: yoyodyne_pretrained.models.EncoderDecoderModel
+  init_args:
+    model_name: google-bert/bert-base-multilingual-cased
+    optimizer:
+      class_path: torch.optim.Adam
+      init_args:
+        lr: 1e-4
+    scheduler:
+      class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+      init_args:
+        warmup_epochs: 3
+    tie_encoder_decoder: true

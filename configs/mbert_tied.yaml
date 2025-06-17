@@ -21,19 +21,20 @@ trainer:
         project: unit1
         save_dir: /Users/Shinji/mbert/models
 model:
-  decoder: google-bert/bert-base-multilingual-cased
-  encoder: google-bert/bert-base-multilingual-cased
-  tie_encoder_decoder: true
-  dropout: 0.4842384076860544
-  label_smoothing: 0.1337104241885073
-  optimizer:
-    class_path: torch.optim.Adam
-    init_args:
-      lr: 0.0007555117338671614
-  scheduler:
-    class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
-    init_args:
-      warmup_epochs: 31
+  class_path: yoyodyne_pretrained.models.EncoderDecoderModel 
+  init_args:
+    dropout: 0.4093681744748403
+    label_smoothing: 0.14915316576243975
+    model_name: google-bert/bert-base-multilingual-cased
+    optimizer:
+      class_path: torch.optim.Adam
+      init_args:
+        lr: 3.5137129343414837e-05
+    scheduler:
+      class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+      init_args:
+        warmup_epochs: 2
+    tie_encoder_decoder: true
 data:
   batch_size: 448
   features_col: 3

@@ -3,101 +3,29 @@
 import lightning
 from lightning.pytorch import cli
 import torch
-from torch import nn, optim
+from torch import optim
 import transformers
 
 from . import data, defaults, metrics
 
 
-class PretrainedModel(lightning.LightningModule):
-    """Yoyodyne pretrained model.
+class BaseModel(lightning.LightningModule):
+    """Model base class.
 
-    This model consists of a pretrained encoder and decoder with randomly
-    initialized cross-attention.
-
-    After:
-        Rothe, S., Narayan, S., and Severyn, A. 2020. Leveraging pre-trained
-        checkpoints for sequence generation tasks. Transactions of the
-        Association for Computational Linguistics 8: 264-280.
-
-    * The forward method returns a tensor of shape B x vocab_size x seq_length
-      for compatibility with loss and evaluation functions.
+    * The forward method returns a loss tensor.
     * Cross-entropy loss is the loss function.
     * One or more predictions tensor(s) are returned by predict_step.
     * Loss is returned by training_step.
     * Evaluation metrics are tracked by test_step; nothing is returned.
     * Validation loss and evaluation metrics are tracked by validation_step;
       nothing is returned.
-
-    Args:
-        dropout: Dropout probability.
-        label_smoothing: Label smoothing probability.
-        encoder: Name of the Hugging Face encoder model.
-        decoder: Name of the Hugging Face decoder model.
-        tie_encoder_decoder: Should we tie the encoder and decoder?
-        num_beams: Width of the beam to use during decoding.
     """
 
-    model: transformers.EncoderDecoderModel
-    loss_func: nn.CrossEntropyLoss
     # TODO: update with new metrics as they become available.
     accuracy: metrics.Accuracy | None
     generation_config: transformers.GenerationConfig
     optimizer: optim.Optimizer
     scheduler: optim.lr_scheduler.LRScheduler
-
-    def __init__(
-        self,
-        dropout=defaults.DROPOUT,
-        label_smoothing=defaults.LABEL_SMOOTHING,
-        encoder=defaults.ENCODER,
-        decoder=defaults.DECODER,
-        tie_encoder_decoder=defaults.TIE_ENCODER_DECODER,
-        num_beams=defaults.NUM_BEAMS,
-        compute_accuracy=True,
-        optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
-        scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
-    ):
-        super().__init__()
-        # Needed for various attributes.
-        self.model = (
-            transformers.EncoderDecoderModel.from_encoder_decoder_pretrained(
-                encoder,
-                decoder,
-                tie_encoder_decoder=tie_encoder_decoder,
-                encoder_hidden_dropout_prob=dropout,
-                decoder_hidden_dropout_prob=dropout,
-            )
-        )
-        # Necessary patching for decoding.
-        decoder_tokenizer = transformers.AutoTokenizer.from_pretrained(decoder)
-        bos = decoder_tokenizer.cls_token_id
-        eos = decoder_tokenizer.sep_token_id
-        pad = decoder_tokenizer.pad_token_id
-        self.model.config.decoder_start_token_id = bos
-        self.model.config.bos_token_id = bos
-        self.model.config.eos_token_id = eos
-        self.model.config.pad_token_id = pad
-        target_vocab_size = (
-            self.model.get_decoder().get_output_embeddings().out_features
-        )
-        self.accuracy = (
-            metrics.Accuracy(ignore_index=pad, num_classes=target_vocab_size)
-            if compute_accuracy
-            else None
-        )
-        self.generation_config = transformers.GenerationConfig(
-            decoder_start_token_id=bos,
-            bos_token_id=bos,
-            eos_token_id=eos,
-            pad_token_id=pad,
-            early_stopping=True,
-            num_beams=num_beams,
-        )
-        # Actually initialized by configure_optimizers.
-        self.optimizer = optimizer
-        self.scheduler = scheduler
-        self.save_hyperparameters()
 
     def configure_optimizers(
         self,
@@ -180,3 +108,141 @@ class PretrainedModel(lightning.LightningModule):
             attention_mask=source_mask,
             generation_config=self.generation_config,
         )
+
+
+class EncoderDecoderModel(BaseModel):
+    """Pretrained encoder/decoder.
+
+    This model consists of a pretrained encoder and decoder with randomly
+    initialized cross-attention.
+
+    After:
+        Rothe, S., Narayan, S., and Severyn, A. 2020. Leveraging pre-trained
+        checkpoints for sequence generation tasks. Transactions of the
+        Association for Computational Linguistics 8: 264-280.
+
+    Args:
+        encoder: Name of the Hugging Face encoder model.
+        decoder: Name of the Hugging Face decoder model.
+        dropout: Dropout probability.
+        label_smoothing: Label smoothing probability.
+        num_beams: Width of the beam to use during decoding.
+    """
+
+    model: transformers.EncoderDecoderModel
+
+    def __init__(
+        self,
+        *,
+        model_name="google-bert/bert-base-multilingual-cased",
+        dropout=defaults.DROPOUT,
+        label_smoothing=defaults.LABEL_SMOOTHING,
+        tie_encoder_decoder=True,
+        num_beams=defaults.NUM_BEAMS,
+        compute_accuracy=True,
+        optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
+        scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
+    ):
+        super().__init__()
+        self.model = (
+            transformers.EncoderDecoderModel.from_encoder_decoder_pretrained(
+                model_name,
+                model_name,
+                tie_encoder_decoder=tie_encoder_decoder,
+                encoder_hidden_dropout_prob=dropout,
+                decoder_hidden_dropout_prob=dropout,
+            )
+        )
+        # Necessary patching for decoding.
+        tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
+        bos = tokenizer.cls_token_id
+        eos = tokenizer.sep_token_id
+        pad = tokenizer.pad_token_id
+        self.model.config.decoder_start_token_id = bos
+        self.model.config.bos_token_id = bos
+        self.model.config.eos_token_id = eos
+        self.model.config.pad_token_id = pad
+        target_vocab_size = (
+            self.model.get_decoder().get_output_embeddings().out_features
+        )
+        self.accuracy = (
+            metrics.Accuracy(ignore_index=pad, num_classes=target_vocab_size)
+            if compute_accuracy
+            else None
+        )
+        self.generation_config = transformers.GenerationConfig(
+            decoder_start_token_id=bos,
+            bos_token_id=bos,
+            eos_token_id=eos,
+            pad_token_id=pad,
+            early_stopping=True,
+            num_beams=num_beams,
+        )
+        # Actually initialized by configure_optimizers.
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.save_hyperparameters()
+
+
+class T5Model(BaseModel):
+    """T5 model (usually mT5 or ByT5).
+
+    After:
+        Raffel, C., Shazeer, N. M., Roberts, A., Lee, K., Narang, S., Matena,
+        M., ..., and Liu, P. J. 2020. Exploring the limits of transfer
+        learning with a unified text-to-text transformer. Journal of Machine
+        Learning Research 21: 1-67.
+
+    Args:
+        dropout: Dropout probability.
+        label_smoothing: Label smoothing probability.
+        model_name: Name of the Hugging Face T5 model.
+        num_beams: Width of the beam to use during decoding.
+    """
+
+    model: transformers.T5ForConditionalGeneration
+
+    def __init__(
+        self,
+        *,
+        model_name="google/byt5-base",
+        dropout=defaults.DROPOUT,
+        label_smoothing=defaults.LABEL_SMOOTHING,
+        num_beams=defaults.NUM_BEAMS,
+        compute_accuracy=True,
+        optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
+        scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
+    ):
+        super().__init__()
+        self.model = transformers.AutoModelForSeq2SeqLM.from_pretrained(
+            model_name, dropout_rate=dropout
+        )
+        # BOS is apparently not used.
+        eos = self.model.config.eos_token_id
+        pad = self.model.config.pad_token_id
+        self.model.config.decoder_start_token_id = pad
+        target_vocab_size = self.model.get_decoder().embed_tokens.embedding_dim
+        self.accuracy = (
+            metrics.Accuracy(ignore_index=pad, num_classes=target_vocab_size)
+            if compute_accuracy
+            else None
+        )
+        self.generation_config = transformers.GenerationConfig(
+            decoder_start_token_id=pad,
+            eos_token_id=eos,
+            pad_token_id=pad,
+            early_stopping=True,
+            num_beams=num_beams,
+        )
+        # Actually initialized by configure_optimizers.
+        self.optimizer = optimizer
+        self.scheduler = scheduler
+        self.save_hyperparameters()
+
+    # Overrides to discard the leading BOS in the POS. This is harmless for
+    # prediction.
+
+    def _decode(
+        self, source: torch.Tensor, source_mask: torch.Tensor
+    ) -> torch.Tensor:
+        return super()._decode(source, source_mask)[:, 1:]
