@@ -19,6 +19,7 @@ trainer:
       init_args:
         project: unit1
         save_dir: /Users/Shinji/mbert/models
+  precision: bf16-mixed
 data:
   features_col: 3
   train: /Users/Shinji/conll2017/english-train-high
