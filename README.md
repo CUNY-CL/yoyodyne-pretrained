@@ -311,6 +311,31 @@ Yoyodyne Pre-trained is distributed under an [Apache 2.0 license](LICENSE.txt).
 
 We welcome contributions using the fork-and-pull model.
 
+## For developers
+
+This section contains instructions for the Yoyodyne-Pretrained maintainers.
+
+### Releasing
+
+1.  Create a new branch. E.g., if you want to call this branch "release":
+    `git checkout -b release`
+2.  Sync your fork's branch to the upstream master branch. E.g., if the upstream
+    remote is called "upstream": `git pull upstream master`
+3.  Increment the version field in [`pyproject.toml`](pyproject.toml).
+4.  Stage your changes: `git add pyproject.toml`.
+5.  Commit your changes: `git commit -m "your commit message here"`
+6.  Push your changes. E.g., if your branch is called "release":
+    `git push origin release`
+7.  Submit a PR for your release and wait for it to be merged into `master`.
+8.  Tag the `master` branch's last commit. The tag should begin with `v`; e.g.,
+    if the new version is 3.1.4, the tag should be `v3.1.4`. This can be done:
+    -   on GitHub itself: click the "Releases" or "Create a new release" link on
+        the right-hand side of the Yoyodyne GitHub page) and follow the
+        dialogues.
+    -   from the command-line using `git tag`.
+9.  Build the new release: `python -m build`
+10. Upload the result to PyPI: `twine upload dist/*`
+
 ## References
 
 Rothe, S., Narayan, S., and Severyn, A. 2020. Leveraging pre-trained checkpoints
