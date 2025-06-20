@@ -1,4 +1,4 @@
-# Yoyodyne 🪀 Pre-trained
+# Yoyodyne 🪀 Pretrained
 
 [![PyPI
 version](https://badge.fury.io/py/yoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
@@ -6,7 +6,7 @@ version](https://badge.fury.io/py/yoyodyne-pretrained.svg)](https://pypi.org/pro
 versions](https://img.shields.io/pypi/pyversions/yoyodyne-pretrained.svg)](https://pypi.org/project/yoyodyne-pretrained)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/CUNY-CL/yoyodyne-pretrained/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/CUNY-CL/yoyodyne-pretrained/tree/master)
 
-Yoyodyne Pre-trained provides sequence-to-sequence transduction with pre-trained
+Yoyodyne Pretrained provides sequence-to-sequence transduction with pretrained
 transformer modules.
 
 These models are implemented using [PyTorch](https://pytorch.org/),
@@ -15,35 +15,35 @@ transformers](https://huggingface.co/docs/transformers/en/index).
 
 ## Philosophy
 
-Yoyodyne Pre-trained inherits many of the same features as Yoyodyne itself, but
-limits itself to two types of pre-trained transformers:
+Yoyodyne Pretrained inherits many of the same features as Yoyodyne itself, but
+limits itself to two types of pretrained transformers:
 
--   a pre-trained transformer encoder and a pre-trained transformer decoder with
+-   a pretrained transformer encoder and a pretrained transformer decoder with
     a randomly-initialized cross-attention (à la Rothe et al. 2020)
 -   a T5 model
 
-Because these modules are pre-trained, there are few architectural
+Because these modules are pretrained, there are few architectural
 hyperparameters to set once one has determined which encoder and decoder to
-warm-start from. To keep Yoyodyne as simple as possible, Yoyodyne Pre-trained is
+warm-start from. To keep Yoyodyne as simple as possible, Yoyodyne Pretrained is
 a separate library though it has many of the same features and interfaces.
 
 ## Installation
 
-🚧 **NB** 🚧: Yoyodyne Pre-trained depends on libraries that are not compatible
+🚧 **NB** 🚧: Yoyodyne Pretrained depends on libraries that are not compatible
 with Yoyodyne itself. We intend to [upgrade Yoyodyne to these libraries
 shortly](https://github.com/CUNY-CL/yoyodyne/issues/60) but until we do, users
-should install Yoyodyne Pre-trained in a separate (Python or Conda) environment
+should install Yoyodyne Pretrained in a separate (Python or Conda) environment
 from Yoyodyne itself.
 
 ### Local installation
 
-To install Yoyodyne Pre-trained and its dependencies, run the following command:
+To install Yoyodyne Pretrained and its dependencies, run the following command:
 
     pip install .
 
 ## File formats
 
-Other than YAML configuration files, Yoyodyne Pre-trained operates on basic
+Other than YAML configuration files, Yoyodyne Pretrained operates on basic
 tab-separated values (TSV) data files. The user can specify source, features,
 and target columns. If a feature column is specified, it is concatenated (with a
 separating space) to the source.
@@ -61,9 +61,9 @@ subcommand.
 
 ### Training (`fit`)
 
-In `fit` mode, one trains a Yoyodyne Pre-trained model from scratch. Naturally,
+In `fit` mode, one trains a Yoyodyne Pretrained model from scratch. Naturally,
 most configuration options need to be set at training time. E.g., it is not
-possible to switch between different pre-trained encoders or enable new tasks
+possible to switch between different pretrained encoders or enable new tasks
 after training.
 
 This mode is invoked using the `fit` subcommand, like so:
@@ -102,7 +102,7 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
 
 #### Optimization
 
-Yoyodyne Pre-trained requires an optimizer and an LR scheduler. The default
+Yoyodyne Pretrained requires an optimizer and an LR scheduler. The default
 optimizer is Adam and the default scheduler is
 `yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its
 initial value and takes no other arguments.
@@ -133,7 +133,7 @@ follows.
       verbose: true
       ...
 
-A checkpoint config must be specified or Yoyodyne Pre-trained will not generate
+A checkpoint config must be specified or Yoyodyne Pretrained will not generate
 any checkpoints.
 
 #### Callbacks
@@ -177,7 +177,7 @@ files](configs) we provide.
 
 #### Logging
 
-By default, Yoyodyne Pre-trained performs some minimal logging to standard error
+By default, Yoyodyne Pretrained performs some minimal logging to standard error
 and uses progress bars to keep track of progress during each epoch. However, one
 can enable additional logging faculties during training, using a similar syntax
 to the one we saw above for callbacks.
@@ -295,7 +295,7 @@ hyperparameter sweeping with [Weights & Biases](https://wandb.ai/site).
 
 ## Testing
 
-Given the size of the models, a basic integration test of Yoyodyne Pre-trained
+Given the size of the models, a basic integration test of Yoyodyne Pretrained
 exceeds what is feasible without access to reasonably powerful GPU. Thus tests
 have to be run locally rather than via cloud-based continuous integration
 systems. The integration tests take roughly 30 minutes in total. To test the
@@ -305,7 +305,7 @@ system, run the following:
 
 ### License
 
-Yoyodyne Pre-trained is distributed under an [Apache 2.0 license](LICENSE.txt).
+Yoyodyne Pretrained is distributed under an [Apache 2.0 license](LICENSE.txt).
 
 ## Contributions
 
@@ -313,7 +313,7 @@ We welcome contributions using the fork-and-pull model.
 
 ## For developers
 
-This section contains instructions for the Yoyodyne-Pretrained maintainers.
+This section contains instructions for the Yoyodyne Pretrained maintainers.
 
 ### Releasing
 
