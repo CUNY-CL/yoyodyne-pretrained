@@ -53,7 +53,7 @@ def main() -> None:
         model_class=models.BaseModel,
         datamodule_class=data.DataModule,
         subclass_mode_model=True,
-        # Prevents prediction logits from accumulating in memory; see the
+        # Prevents prediction from accumulating in memory; see the
         # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
     )
