@@ -7,7 +7,7 @@ from lightning.pytorch import callbacks as pytorch_callbacks, cli
 from . import callbacks, data, models, trainers
 
 
-def yoyodyne_pretrained_python_interface(args: cli.ArgsType = None):
+def yoyodyne_pretrained_python_interface(args: cli.ArgsType = None) -> None:
     """Interface to use models through Python."""
     YoyodynePretrainedCLI(
         models.BaseModel,
