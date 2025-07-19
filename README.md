@@ -107,7 +107,9 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
 #### Optimization
 
 Yoyodyne Pretrained requires an optimizer and an learning rate scheduler. The default
-optimizer is [`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html), and the default scheduler is `yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its initial value and takes no explicit configuration arguments. The following YAML snippet shows the use of the Adam optimizer with a non-default initial learning rate and the `yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot` LR scheduler:
+optimizer is [`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html), and the default scheduler is `yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its initial value and takes no explicit configuration arguments.
+
+The following YAML snippet shows the use of the Adam optimizer with a non-default initial learning rate and the `yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot` LR scheduler:
 
     ...
     model:
