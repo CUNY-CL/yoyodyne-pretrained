@@ -106,7 +106,7 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
 
 #### Optimization
 
-Yoyodyne Pretrained requires an optimizer and an LR scheduler. The default
+Yoyodyne Pretrained requires an optimizer and an learning rate scheduler. The default
 optimizer is Adam and the default scheduler is
 `yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its
 initial value and takes no other arguments.
