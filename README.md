@@ -113,8 +113,7 @@ optimizer is [`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated
 
 The
 [`ModelCheckpoint`](https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.ModelCheckpoint.html)
-is used to control the generation of checkpoint files. A sample YAML snippet is
-given below.
+is used to control the generation of checkpoint files:
 
     ...
     checkpoint:
@@ -124,8 +123,8 @@ given below.
       verbose: true
       ...
 
-Alternatively, one can specify a checkpointing that minimizes validation loss as
-follows.
+Alternatively, one can specify a checkpointing that minimizes validation loss, as
+follows:
 
     ...
     checkpoint:
@@ -147,7 +146,7 @@ The
 [`LearningRateMonitor`](https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.LearningRateMonitor.html)
 callback records learning rates; this is useful when working with multiple
 optimizers and/or schedulers, as we do here. A sample YAML snippet is given
-below.
+below:
 
     ...
     trainer:
@@ -160,7 +159,7 @@ below.
 The
 [`EarlyStopping`](https://lightning.ai/docs/pytorch/stable/common/early_stopping.html)
 callback enables early stopping based on a monitored quantity and a fixed
-"patience". A sample YAML snipppet with a patience of 10 is given below.
+"patience". A sample YAML snipppet with a patience of 10 is given below:
 
     ...
     trainer:
