@@ -45,7 +45,7 @@ separating space) to the source.
 ## Usage
 
 The `yoyodyne_pretrained` command-line tool uses a subcommand interface with
-four different modes. To see the full set of options available with each
+four different modes. To see the full set of options available for each
 subcommand, use the `--print_config` flag. For example:
 
     yoyodyne_pretrained fit --print_config
