@@ -76,8 +76,8 @@ This mode is invoked using the `fit` subcommand, like so:
 
 #### Seeding
 
-Setting the `seed_everything:` argument to some value ensures a reproducible
-experiment.
+Setting the `seed_everything:` argument to some fixed value ensures a reproducible
+experiment (modulo hardware non-determism).
 
 #### Model architecture
 
