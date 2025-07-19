@@ -29,12 +29,6 @@ a separate library though it has many of the same features and interfaces.
 
 ## Installation
 
-🚧 **NB** 🚧: Yoyodyne Pretrained depends on libraries that are not compatible
-with Yoyodyne itself. We intend to [upgrade Yoyodyne to these libraries
-shortly](https://github.com/CUNY-CL/yoyodyne/issues/60) but until we do, users
-should install Yoyodyne Pretrained in a separate (Python or Conda) environment
-from Yoyodyne itself.
-
 ### Local installation
 
 To install Yoyodyne Pretrained and its dependencies, run the following command:
