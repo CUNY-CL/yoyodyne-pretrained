@@ -79,7 +79,7 @@ This mode is invoked using the `fit` subcommand, like so:
 Setting the `seed_everything:` argument to some fixed value ensures a reproducible
 experiment (modulo hardware non-determism).
 
-#### Model architecture
+#### Model architectures
 
 ##### Encoder-decoder models
 
