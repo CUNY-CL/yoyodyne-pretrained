@@ -317,13 +317,9 @@ system, run the following:
 
 Yoyodyne Pretrained is distributed under an [Apache 2.0 license](LICENSE.txt).
 
-## Contributions
-
-We welcome contributions using the fork-and-pull model.
-
 ## For developers
 
-This section contains instructions for the Yoyodyne Pretrained maintainers.
+We welcome contributions using the fork-and-pull model.
 
 ### Releasing
 
