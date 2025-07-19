@@ -188,9 +188,6 @@ callback enables early stopping based on a monitored quantity and a fixed
 
 Adjust the `patience` parameter as needed.
 
-All three of these features are enabled in the [sample configuration
-files](configs) we provide.
-
 #### Logging
 
 By default, Yoyodyne Pretrained performs some minimal logging to standard error
