@@ -47,7 +47,7 @@ constants needed during the sweep, such as trainer arguments or data paths.
          --project "${PROJECT}" \
          --sweep_id "${SWEEP_ID}" \
          --count "${COUNT}" \
-         --config config/tune.yaml
+         --config configs/tune.yaml
 
 Then, one can retrieve the results as follows:
 
