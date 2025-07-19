@@ -67,8 +67,8 @@ subcommand.
 
 In `fit` mode, one trains a Yoyodyne Pretrained model from scratch. Naturally,
 most configuration options need to be set at training time. E.g., it is not
-possible to switch between different pretrained encoders or enable new tasks
-after training.
+possible to switch between different pretrained encoders after training a
+model.
 
 This mode is invoked using the `fit` subcommand, like so:
 
