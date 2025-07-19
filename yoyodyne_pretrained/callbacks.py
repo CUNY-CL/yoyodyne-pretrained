@@ -11,7 +11,7 @@ from . import data, models
 
 
 class PredictionWriter(callbacks.BasePredictionWriter):
-    """Writes predictions in CoNLL-U format.
+    """Writes predictions.
 
     Args:
         path: Path for the predictions file.
