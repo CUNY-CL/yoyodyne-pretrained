@@ -149,8 +149,8 @@ follows:
       verbose: true
       ...
 
-**A checkpoint config must be specified or Yoyodyne Pretrained will not generate
-any checkpoints.**
+A checkpoint config must be specified or Yoyodyne Pretrained will not generate
+any checkpoints.
 
 #### Callbacks
 
