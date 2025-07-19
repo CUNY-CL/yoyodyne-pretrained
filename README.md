@@ -159,9 +159,7 @@ examples are given below.
 
 The
 [`LearningRateMonitor`](https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.LearningRateMonitor.html)
-callback records learning rates; this is useful when working with multiple
-optimizers and/or schedulers, as we do here. A sample YAML snippet is given
-below:
+callback records learning rates:
 
     ...
     trainer:
@@ -174,7 +172,7 @@ below:
 The
 [`EarlyStopping`](https://lightning.ai/docs/pytorch/stable/common/early_stopping.html)
 callback enables early stopping based on a monitored quantity and a fixed
-"patience". A sample YAML snipppet with a patience of 10 is given below:
+`patience`:
 
     ...
     trainer:
@@ -185,8 +183,6 @@ callback enables early stopping based on a monitored quantity and a fixed
           patience: 10
           verbose: true
       ...
-
-Adjust the `patience` parameter as needed.
 
 #### Logging
 
@@ -207,9 +203,6 @@ below.
           init_args:
             save_dir: /Users/Shinji/models
       ...
-       
-
-Adjust the `save_dir` argument as needed.
 
 The
 [`WandbLogger`](https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.WandbLogger.html)
@@ -226,8 +219,7 @@ generate charts or share artifacts. A sample configuration is given below.
           save_dir: /Users/Shinji/models
       ...
 
-Adjust the `project` and `save_dir` arguments as needed; note that this
-functionality requires a working account with Weights & Biases.
+Note that this functionality requires a working account with Weights & Biases.
 
 #### Other options
 
@@ -245,6 +237,12 @@ value greater than 1; the beam width ("number of beams") defaults to 5.
 
 Batch size is specified using `data: batch_size: ...` and defaults to 32.
 
+By default, training uses 32-bit precision. However, the `trainer.: precision: ` flag
+allows the user to perform training with half precision (`16`),
+or with mixed-precision formats like `bf16-mixed` if
+supported by the accelerator. This might reduce the size of the model and batches
+in memory, allowing one to use larger batches, or it may simply provide small speed-ups.
+
 There are a number of ways to specify how long a model should train for. For
 example, the following YAML snippet specifies that training should run for 100
 epochs or 6 wall-clock hours, whichever comes first.
@@ -260,7 +258,7 @@ epochs or 6 wall-clock hours, whichever comes first.
 In `validation` mode, one runs the validation step over labeled validation data
 (specified as `data: val: path/to/validation.tsv`) using a previously trained
 checkpoint (`--ckpt_path path/to/checkpoint.ckpt` from the command line),
-recording total loss and per-task accuracies. In practice this is mostly useful
+recording loss and other statistics for the validation set. In practice this is mostly useful
 for debugging.
 
 This mode is invoked using the `validate` subcommand, like so:
@@ -269,19 +267,18 @@ This mode is invoked using the `validate` subcommand, like so:
 
 ### Evaluation (`test`)
 
-In test mode, we compute accuracy over held-out test data (specified as
+In `test` mode, one computes accuracy over held-out test data (specified as
 `data: test: path/to/test.tsv`) using a previously trained checkpoint
 (`--ckpt_path path/to/checkpoint.ckpt` from the command line); it differs from
-validation mode in that it uses the test file rather than the val file and it
-does not compute loss.
+validation mode in that it uses the `test` file rather than the `val` file.
 
-This mode is invoked using the test subcommand, like so:
+This mode is invoked using the `test` subcommand, like so:
 
     yoyodyne_pretrained test --config path/to/config.yaml --ckpt_path path/to/checkpoint.ckpt
 
 ### Inference (`predict`)
 
-In predict mode, a previously trained model checkpoint
+In `predict` mode, a previously trained model checkpoint
 (`--ckpt_path path/to/checkpoint.ckpt` from the command line) is used to label
 an input file. One must also specify the path where the predictions will be
 written.
@@ -295,7 +292,7 @@ This mode is invoked using the `predict` subcommand, like so:
 
     yoyodyne_pretrained predict --config path/to/config.yaml --ckpt_path path/to/checkpoint.ckpt
 
-**NB**: many tokenizers, including the BERT tokenizer, are lossy in the sense
+Many tokenizers, including the BERT tokenizer, are lossy in the sense
 that they may introduce spaces not present in the input, particularly adjacent
 to word-internal punctuation like dashes (e.g., *state-of-the-art*).
 Unfortunately, there is little that can be done about this within this library,
