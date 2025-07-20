@@ -17,7 +17,7 @@ file ([`configs/byt5_grid.yaml`](configs/byt5_grid.yaml)) is available for ByT5.
 The second file, [`configs/tune.yaml`](configs/tune.yaml), specifies any
 constants needed during the sweep, such as trainer arguments or data paths.
 
-    # Creates a sweep; save the sweep ID as `${SWEEP_ID}` for later.
+    # Creates a sweep; save the sweep ID as ${SWEEP_ID} for later.
     wandb sweep \
         --entity "${ENTITY}" \
         --project "${PROJECT}" \
@@ -58,7 +58,6 @@ the run's "Overview" on W&B, and then run:
     `--config` file but note that hyperparameters set by the sweep will override
     those specified in the `--config`.
 -   By default `random` and `bayes` search run indefinitely, until they are
-    killed. To specify a fixed number of samples, provide the `--count` argument
-    to [`sweep.py`](sweep.py).
+    killed. To specify a fixed number of samples, provide the `--count` argument.
 -   For more information about W&B sweeps, [read
     here](https://docs.wandb.ai/guides/sweeps).
