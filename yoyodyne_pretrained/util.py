@@ -1,9 +1,4 @@
-"""Utility functions for W&B sweep operations.
-
-Adapted from UDTube:
-
-    https://github.com/CUNY-CL/udtube/blob/master/examples/wandb_sweeps/util.py
-"""
+"""Utility functions."""
 
 import logging
 

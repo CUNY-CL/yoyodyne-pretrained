@@ -14,7 +14,7 @@ import unittest
 
 from parameterized import parameterized
 
-from yoyodyne_pretrained import cli
+from yoyodyne_pretrained.cli import main
 
 # Directory the unit test is located in, relative to the working directory.
 DIR = os.path.relpath(os.path.dirname(__file__), os.getcwd())
@@ -59,7 +59,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
     def test_model(self, langcode: str):
         # Fits model.
         train_path = os.path.join(TESTDATA_DIR, f"{langcode}_train.tsv")
-        cli.python_interface(
+        main.python_interface(
             [
                 "fit",
                 f"--config={CONFIG_PATH}",
@@ -76,7 +76,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
             self.tempdir.name, f"{langcode}_predicted.txt"
         )
         expected_path = os.path.join(TESTDATA_DIR, f"{langcode}_expected.txt")
-        cli.python_interface(
+        main.python_interface(
             [
                 "predict",
                 f"--ckpt_path={checkpoint_path}",
@@ -95,7 +95,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
         expected_path = os.path.join(TESTDATA_DIR, f"{langcode}_expected.test")
         with open(evaluated_path, "w") as sink:
             with contextlib.redirect_stdout(sink):
-                cli.python_interface(
+                main.python_interface(
                     [
                         "test",
                         f"--ckpt_path={checkpoint_path}",

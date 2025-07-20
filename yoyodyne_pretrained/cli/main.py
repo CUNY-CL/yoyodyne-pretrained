@@ -4,7 +4,7 @@ import logging
 
 from lightning.pytorch import callbacks as pytorch_callbacks, cli
 
-from . import callbacks, data, models, trainers
+from .. import callbacks, data, models, trainers
 
 
 class YoyodynePretrainedCLI(cli.LightningCLI):
@@ -57,7 +57,3 @@ def python_interface(args: cli.ArgsType = None) -> None:
         trainer_class=trainers.Trainer,
         args=args,
     )
-
-
-if __name__ == "__main__":
-    main()

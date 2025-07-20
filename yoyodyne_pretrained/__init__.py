@@ -1,4 +1,4 @@
-"""Yoyodyne Pre-trained: pre-trained sequence-to-sequence transduction.
+"""Yoyodyne Pretrained: pre-trained sequence-to-sequence transduction.
 
 This module just silences some uninformative warnings.
 """
