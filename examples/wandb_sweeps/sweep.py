@@ -30,7 +30,7 @@ def train_sweep(
     """Runs a single training run.
 
     Args:
-        config: path to Yoyodyne Pre-trained YAML config file.
+        config: path to Yoyodyne Pretrained YAML config file.
         temp_config: temporary configuration file handle.
         argv: command-line arguments.
     """
@@ -61,7 +61,7 @@ def populate_config(
     The wandb config data used here comes from the environment.
 
     Args:
-        config: path to Yoyodyne Pre-trained YAML config file.
+        config: path to Yoyodyne Pretrained YAML config file.
         temp_config_handle: temporary configuration file handle.
     """
     wandb.init()

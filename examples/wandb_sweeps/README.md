@@ -41,7 +41,7 @@ constants needed during the sweep, such as trainer arguments or data paths.
         --project "${PROJECT}" \
         configs/mbert_grid.yaml
     # Runs the sweep itself using hyperparameters from the the sweep and
-    # additional fixed parameters from a Yoyodyne Pre-trained config file.
+    # additional fixed parameters from a Yoyodyne Pretrained config file.
     ./sweep.py \
          --entity "${ENTITY}" \
          --project "${PROJECT}" \

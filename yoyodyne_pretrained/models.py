@@ -49,7 +49,16 @@ class BaseModel(lightning.LightningModule):
         return self._decode(batch.source, batch.source_mask)
 
     def training_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
-        return self(batch)
+        loss = self(batch)
+        self.log(
+            "train_loss",
+            loss,
+            batch_size=len(batch),
+            on_epoch=True,
+            on_step=False,
+            prog_bar=True,
+        )
+        return loss
 
     def on_test_epoch_start(self) -> None:
         self._reset_metrics()
