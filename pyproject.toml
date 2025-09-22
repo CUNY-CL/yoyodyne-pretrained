@@ -44,7 +44,6 @@ dependencies = [
 
 [project.scripts]
 yoyodyne_pretrained = "yoyodyne_pretrained.cli.main:main"
-yoyodyne_pretrained_hyperparameters = "yoyodyne_pretrained.cli.hyperparameters:main"
 yoyodyne_pretrained_sweep = "yoyodyne_pretrained.cli.sweep:main"
 
 [project.urls]
