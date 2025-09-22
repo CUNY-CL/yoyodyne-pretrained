@@ -24,7 +24,7 @@ parameters:
     min: 1.0e-06
     max: 0.001
   model.init_args.scheduler.class_path:
-    value: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+    value: yoyodyne.schedulers.WarmupInverseSquareRoot
   model.init_args.scheduler.init_args.warmup_epochs:
     distribution: q_uniform
     q: 1
