@@ -41,28 +41,12 @@ Suppose one wants to add a metric called Wham. Then one must:
             )
 """
 
-# TODO: This will eventually be available from vanilla Yoyodyne; use that and
-# delete this once it is.
-
-
 import torch
 import torchmetrics
 
 
 class Error(Exception):
     pass
-
-
-# This maps metrics, as specified as command-line strings, onto three
-# pieces of data:
-#
-# * `filename` is an f-string template (note it is not an f-string literal)
-#   which is used when that metric is used for checkpointing.
-#   It includes the integer `epoch` and the value of `monitor` (see below)
-#   in the template.
-# * `mode` is either "max" or "min" and indicates whether we want to
-#   maximize or minimize the metric.
-# * `monitor` is the name of the metric with a `val_` prefix.
 
 
 class Accuracy(torchmetrics.classification.MulticlassExactMatch):

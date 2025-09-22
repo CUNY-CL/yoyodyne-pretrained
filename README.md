@@ -18,8 +18,8 @@ transformers](https://huggingface.co/docs/transformers/en/index).
 Yoyodyne Pretrained inherits many of the same features as Yoyodyne itself, but
 limits itself to two types of pretrained transformers:
 
--   a pretrained transformer encoder and a pretrained transformer decoder with
-    a randomly-initialized cross-attention (à la Rothe et al. 2020)
+-   a pretrained transformer encoder and a pretrained transformer decoder with a
+    randomly-initialized cross-attention (à la Rothe et al. 2020)
 -   a T5 model
 
 Because these modules are pretrained, there are few architectural
@@ -40,10 +40,11 @@ To install Yoyodyne Pretrained and its dependencies, run the following command:
 Yoyodyne Pretrained is also compatible with [Google
 Colab](https://colab.research.google.com/) GPU runtimes.
 
-1. Click "Runtime" > "Change Runtime Type".
-2. In the dialogue box, under the "Hardware accelerator" dropdown box, select "GPU", then click "Save".
-3. You may be prompted to delete the old runtime. Do so if you wish.
-4. Then install and run using the `!` as a prefix to shell commands.
+1.  Click "Runtime" \> "Change Runtime Type".
+2.  In the dialogue box, under the "Hardware accelerator" dropdown box, select
+    "GPU", then click "Save".
+3.  You may be prompted to delete the old runtime. Do so if you wish.
+4.  Then install and run using the `!` as a prefix to shell commands.
 
 ## File formats
 
@@ -67,8 +68,7 @@ subcommand.
 
 In `fit` mode, one trains a Yoyodyne Pretrained model from scratch. Naturally,
 most configuration options need to be set at training time. E.g., it is not
-possible to switch between different pretrained encoders after training a
-model.
+possible to switch between different pretrained encoders after training a model.
 
 This mode is invoked using the `fit` subcommand, like so:
 
@@ -76,8 +76,8 @@ This mode is invoked using the `fit` subcommand, like so:
 
 #### Seeding
 
-Setting the `seed_everything:` argument to some fixed value ensures a reproducible
-experiment (modulo hardware non-determism).
+Setting the `seed_everything:` argument to some fixed value ensures a
+reproducible experiment (modulo hardware non-determism).
 
 #### Model architectures
 
@@ -106,10 +106,18 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
 
 #### Optimization
 
-Yoyodyne Pretrained requires an optimizer and an learning rate scheduler. The default
-optimizer is [`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html), and the default scheduler is `yoyodyne_pretrained.schedulers.Dummy`, which keeps learning rate fixed at its initial value and takes no explicit configuration arguments.
+Yoyodyne Pretrained requires an optimizer and an learning rate scheduler. The
+default optimizer is
+[`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html),
+and the default scheduler is the inherited
+[`yoyodyne.schedulers.Dummy`](https://github.com/CUNY-CL/yoyodyne/blob/d554eb891ac16a4cb741c507abc5e810321b7241/yoyodyne/schedulers.py#L9),
+which keeps learning rate fixed at its initial value and takes no explicit
+configuration arguments.
 
-The following YAML snippet shows the use of the Adam optimizer with a non-default initial learning rate and the `yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot` LR scheduler:
+The following YAML snippet shows the use of the Adam optimizer with a
+non-default initial learning rate and the inherited
+[`yoyodyne.schedulers.WarmupInverseSquareRoot`](https://github.com/CUNY-CL/yoyodyne/blob/d554eb891ac16a4cb741c507abc5e810321b7241/yoyodyne/schedulers.py#L26)
+LR scheduler:
 
     ...
     model:
@@ -119,7 +127,7 @@ The following YAML snippet shows the use of the Adam optimizer with a non-defaul
           init_args:
             lr: 1.0e-5
         scheduler:
-          class_path: yoyodyne_pretrained.schedulers.WarmupInverseSquareRoot
+          class_path: yoyodyne.schedulers.WarmupInverseSquareRoot
           init_args:
             warmup_epochs: 10
         ...
@@ -138,8 +146,8 @@ is used to control the generation of checkpoint files:
       verbose: true
       ...
 
-Alternatively, one can specify a checkpointing that minimizes validation loss, as
-follows:
+Alternatively, one can specify a checkpointing that minimizes validation loss,
+as follows:
 
     ...
     checkpoint:
@@ -237,11 +245,11 @@ value greater than 1; the beam width ("number of beams") defaults to 5.
 
 Batch size is specified using `data: batch_size: ...` and defaults to 32.
 
-By default, training uses 32-bit precision. However, the `trainer.: precision: ` flag
-allows the user to perform training with half precision (`16`),
-or with mixed-precision formats like `bf16-mixed` if
-supported by the accelerator. This might reduce the size of the model and batches
-in memory, allowing one to use larger batches, or it may simply provide small speed-ups.
+By default, training uses 32-bit precision. However, the `trainer.: precision:`
+flag allows the user to perform training with half precision (`16`), or with
+mixed-precision formats like `bf16-mixed` if supported by the accelerator. This
+might reduce the size of the model and batches in memory, allowing one to use
+larger batches, or it may simply provide small speed-ups.
 
 There are a number of ways to specify how long a model should train for. For
 example, the following YAML snippet specifies that training should run for 100
@@ -258,8 +266,8 @@ epochs or 6 wall-clock hours, whichever comes first.
 In `validation` mode, one runs the validation step over labeled validation data
 (specified as `data: val: path/to/validation.tsv`) using a previously trained
 checkpoint (`--ckpt_path path/to/checkpoint.ckpt` from the command line),
-recording loss and other statistics for the validation set. In practice this is mostly useful
-for debugging.
+recording loss and other statistics for the validation set. In practice this is
+mostly useful for debugging.
 
 This mode is invoked using the `validate` subcommand, like so:
 
@@ -292,11 +300,11 @@ This mode is invoked using the `predict` subcommand, like so:
 
     yoyodyne_pretrained predict --config path/to/config.yaml --ckpt_path path/to/checkpoint.ckpt
 
-Many tokenizers, including the BERT tokenizer, are lossy in the sense
-that they may introduce spaces not present in the input, particularly adjacent
-to word-internal punctuation like dashes (e.g., *state-of-the-art*).
-Unfortunately, there is little that can be done about this within this library,
-but it may be possible to fix this as a post-processing step.
+Many tokenizers, including the BERT tokenizer, are lossy in the sense that they
+may introduce spaces not present in the input, particularly adjacent to
+word-internal punctuation like dashes (e.g., *state-of-the-art*). Unfortunately,
+there is little that can be done about this within this library, but it may be
+possible to fix this as a post-processing step.
 
 ## Examples
 
