@@ -1,8 +1,7 @@
 """Defaults."""
 
 from torch import optim
-
-from . import schedulers
+from yoyodyne import schedulers
 
 # Default text encoding.
 ENCODING = "utf-8"
