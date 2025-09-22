@@ -14,7 +14,7 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           command: << parameters.command-run >>
-  build-test-python:
+  build-python:
     parameters:
       python-version:
         type: string
@@ -26,7 +26,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Installs package
+          name: Build source distribution and install package from it 
           command: |
               pip install -r requirements.txt && \
               python -m build && \
@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Show installed Python packages
           command: pip list -v
-      # A test would go if we had one that could run on CircleCI.
+       
 workflows:
   version: 2
   build:
@@ -51,7 +51,7 @@ workflows:
             python -m build && \
             twine check dist/`ls dist/ | grep .tar.gz` && \
             twine check dist/`ls dist/ | grep .whl`
-      - build-test-python:
+      - build-python:
           requires:
             - black
             - flake8
