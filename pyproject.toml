@@ -39,12 +39,11 @@ dependencies = [
     "torchmetrics==1.7.4",
     "transformers>=4.44.0,<5.0.0",
     "wandb>=0.18.7,<0.19.0",
-    "yoyodyne>=0.4.0",
+    "yoyodyne>=0.4.1",
 ]
 
 [project.scripts]
-yoyodyne_pretrained = "yoyodyne_pretrained.cli.main:main"
-yoyodyne_pretrained_sweep = "yoyodyne_pretrained.cli.sweep:main"
+yoyodyne_pretrained = "yoyodyne_pretrained.cli:main"
 
 [project.urls]
 homepage = "https://github.com/CUNY-CL/yoyodyne-pretrained"

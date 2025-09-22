@@ -1,7 +1,8 @@
 # W&B Sweeps
 
-This directory contains example scripts for running a hyperparameter sweep with
-[Weights & Biases](https://wandb.ai/site).
+This directory contains documentation on running a hyperparameter sweep with
+[Weights & Biases](https://wandb.ai/site) and software from
+[Yoyodyne](https://github.com/CUNY-CL/yoyodyne).
 
 ## Usage
 
@@ -24,12 +25,13 @@ constants needed during the sweep, such as trainer arguments or data paths.
         configs/mbert_grid.yaml
     # Runs the sweep itself using hyperparameters from the the sweep and
     # additional fixed parameters from a Yoyodyne Pretrained config file.
-    yoyodyne_pretrained_sweep \
-         --entity "${ENTITY}" \
-         --project "${PROJECT}" \
-         --sweep_id "${SWEEP_ID}" \
-         --count "${COUNT}" \
-         --config configs/tune.yaml
+    yoyodyne_sweep \
+        --command "yoyodyne_pretrained" \
+        --entity "${ENTITY}" \
+        --project "${PROJECT}" \
+        --sweep_id "${SWEEP_ID}" \
+        --count "${COUNT}" \
+        --config configs/tune.yaml
 
 Then, one can retrieve the results as follows:
 
