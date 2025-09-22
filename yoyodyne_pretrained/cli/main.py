@@ -3,8 +3,9 @@
 import logging
 
 from lightning.pytorch import callbacks as pytorch_callbacks, cli
+from yoyodyne import trainers
 
-from .. import callbacks, data, models, trainers
+from .. import callbacks, data, models
 
 
 class YoyodynePretrainedCLI(cli.LightningCLI):
@@ -40,8 +41,6 @@ def main() -> None:
         model_class=models.BaseModel,
         datamodule_class=data.DataModule,
         subclass_mode_model=True,
-        # Prevents predictions from accumulating in memory; see the
-        # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
     )
 
@@ -52,8 +51,6 @@ def python_interface(args: cli.ArgsType = None) -> None:
         models.BaseModel,
         data.DataModule,
         subclass_mode_model=True,
-        # Prevents predictions from accumulating in memory; see the
-        # documentation in `trainers.py` for more context.
         trainer_class=trainers.Trainer,
         args=args,
     )
