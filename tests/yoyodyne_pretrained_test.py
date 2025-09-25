@@ -91,7 +91,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
             [
                 "predict",
                 f"--ckpt_path={checkpoint_path}",
-                f"--data={data_config_path}",
+                f"--data={self.DATA_CONFIG_PATH}",
                 f"--data.model_dir={model_dir}",
                 f"--data.predict={test_path}",
                 f"--model={model_config_path}",
@@ -109,7 +109,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
                     [
                         "test",
                         f"--ckpt_path={checkpoint_path}",
-                        f"--data={data_config_path}",
+                        f"--data={self.DATA_CONFIG_PATH}",
                         f"--data.test={test_path}",
                         f"--data.model_dir={model_dir}",
                         f"--model={model_config_path}",
