@@ -28,6 +28,11 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
             required=False,
         )
         parser.link_arguments("model.init_args.model_name", "data.model_name")
+        parser.link_arguments(
+            "data.model_dir",
+            "trainer.logger.init_args.save_dir",
+            apply_on="instantiate",
+        )
 
 
 def main() -> None:
@@ -42,6 +47,9 @@ def main() -> None:
         datamodule_class=data.DataModule,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
+        trainer_defaults={
+            "logger": {"class_path": "lightning.pytorch.loggers.CSVLogger"}
+        },
     )
 
 
@@ -52,5 +60,8 @@ def python_interface(args: cli.ArgsType = None) -> None:
         data.DataModule,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
+        trainer_defaults={
+            "logger": {"class_path": "lightning.pytorch.loggers.CSVLogger"}
+        },
         args=args,
     )

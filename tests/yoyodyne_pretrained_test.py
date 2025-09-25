@@ -1,9 +1,6 @@
-"""Full tests of training and prediction.
+"""Full trests of training and prediction.
 
-This runs five epochs of training over a small toy data set, attempting to
-overfit, then compares the resubstitution predictions on this set to
-previously computed results. As such this is essentially a change-detector
-test.
+See testdata/data for code for regenerating data and accuracy/loss statistics.
 """
 
 import contextlib
@@ -14,12 +11,7 @@ import unittest
 
 from parameterized import parameterized
 
-from yoyodyne_pretrained.cli import main
-
-# Directory the unit test is located in, relative to the working directory.
-DIR = os.path.relpath(os.path.dirname(__file__), os.getcwd())
-CONFIG_PATH = os.path.join(DIR, "testdata/mbert.yaml")
-TESTDATA_DIR = os.path.join(DIR, "testdata")
+from yoyodyne_pretrained import cli
 
 
 class YoyodynePretrainedTest(unittest.TestCase):
@@ -49,59 +41,83 @@ class YoyodynePretrainedTest(unittest.TestCase):
         self.tempdir = tempfile.TemporaryDirectory(
             prefix="yoyodyne_pretrained_test-"
         )
-        self.assertNonEmptyFileExists(CONFIG_PATH)
 
     def tearDown(self):
         self.tempdir.cleanup()
 
-    # Only English is included right now but we leave this a possibility.
-    @parameterized.expand(["en"])
-    def test_model(self, langcode: str):
-        # Fits model.
-        train_path = os.path.join(TESTDATA_DIR, f"{langcode}_train.tsv")
-        main.python_interface(
+    DIR = os.path.relpath(os.path.dirname(__file__), os.getcwd())
+    CONFIG_DIR = os.path.join(DIR, "testdata/configs")
+    TESTDATA_DIR = os.path.join(DIR, "testdata/data")
+    DATA_CONFIG_PATH = os.path.join(CONFIG_DIR, "data.yaml")
+    CHECKPOINT_CONFIG_PATH = os.path.join(CONFIG_DIR, "checkpoint.yaml")
+    TRAINER_CONFIG_PATH = os.path.join(CONFIG_DIR, "trainer.yaml")
+    SEED = 49
+
+    @parameterized.expand(["byt5", "mbert_tied"])
+    def test_model(self, arch: str):
+        train_path = os.path.join(self.TESTDATA_DIR, "train.tsv")
+        self.assertNonEmptyFileExists(train_path)
+        dev_path = os.path.join(self.TESTDATA_DIR, "dev.tsv")
+        self.assertNonEmptyFileExists(dev_path)
+        test_path = os.path.join(self.TESTDATA_DIR, "test.tsv")
+        self.assertNonEmptyFileExists(test_path)
+        model_dir = os.path.join(self.tempdir.name, "models")
+        # Gets config paths.
+        model_config_path = os.path.join(self.CONFIG_DIR, f"{arch}.yaml")
+        self.assertNonEmptyFileExists(model_config_path)
+        # Fits and confirms creation of the checkpoint.
+        cli.python_interface(
             [
                 "fit",
-                f"--config={CONFIG_PATH}",
+                f"--checkpoint={self.CHECKPOINT_CONFIG_PATH}",
+                f"--data={self.DATA_CONFIG_PATH}",
                 f"--data.train={train_path}",
-                # We are trying to overfit on the training data.
-                f"--data.val={train_path}",
+                f"--data.val={dev_path}",
+                f"--data.model_dir={model_dir}",
+                f"--model={model_config_path}",
+                f"--seed_everything={self.SEED}",
+                f"--trainer={self.TRAINER_CONFIG_PATH}",
             ]
         )
-        # Confirms a checkpoint was created.
-        checkpoint_path = "lightning_logs/version_0/checkpoints/last.ckpt"
-        self.assertNonEmptyFileExists(checkpoint_path)
-        # Predicts on "expected" data.
-        predicted_path = os.path.join(
-            self.tempdir.name, f"{langcode}_predicted.txt"
+        checkpoint_path = (
+            f"{model_dir}/lightning_logs/version_0/checkpoints/last.ckpt"
         )
-        expected_path = os.path.join(TESTDATA_DIR, f"{langcode}_expected.txt")
-        main.python_interface(
+        self.assertNonEmptyFileExists(checkpoint_path)
+        # Predicts on test data.
+        predicted_path = os.path.join(
+            self.tempdir.name, f"_{arch}_predicted.txt"
+        )
+        cli.python_interface(
             [
                 "predict",
                 f"--ckpt_path={checkpoint_path}",
-                f"--config={CONFIG_PATH}",
-                f"--data.predict={train_path}",
+                f"--data={self.DATA_CONFIG_PATH}",
+                f"--data.model_dir={model_dir}",
+                f"--data.predict={test_path}",
+                f"--model={model_config_path}",
                 f"--prediction.path={predicted_path}",
             ]
         )
         self.assertNonEmptyFileExists(predicted_path)
-        self.assertFileIdentity(predicted_path, expected_path)
-        # Evaluates on "expected" data.
-        evaluated_path = os.path.join(
-            self.tempdir.name,
-            f"{langcode}_evaluated.test",
+        evaluation_path = os.path.join(
+            self.tempdir.name, f"{arch}_evaluated.test"
         )
-        expected_path = os.path.join(TESTDATA_DIR, f"{langcode}_expected.test")
-        with open(evaluated_path, "w") as sink:
+        # Evaluates on test data and compares with result.
+        with open(evaluation_path, "w") as sink:
             with contextlib.redirect_stdout(sink):
-                main.python_interface(
+                cli.python_interface(
                     [
                         "test",
                         f"--ckpt_path={checkpoint_path}",
-                        f"--config={CONFIG_PATH}",
-                        f"--data.test={train_path}",
+                        f"--data={self.DATA_CONFIG_PATH}",
+                        f"--data.test={test_path}",
+                        f"--data.model_dir={model_dir}",
+                        f"--model={model_config_path}",
+                        "--trainer.enable_progress_bar=false",
                     ]
                 )
-        self.assertNonEmptyFileExists(evaluated_path)
-        self.assertFileIdentity(evaluated_path, expected_path)
+        self.assertNonEmptyFileExists(evaluation_path)
+        expected_path = os.path.join(
+            self.TESTDATA_DIR, f"{arch}_expected.test"
+        )
+        self.assertFileIdentity(evaluation_path, expected_path)

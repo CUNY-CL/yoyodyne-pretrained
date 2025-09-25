@@ -12,6 +12,7 @@ class DataModule(lightning.LightningDataModule):
     """String pair data module.
 
     Args:
+        model_dir: Path for checkpoints and logs.
         model_name: Full name of a Hugging Face model; filled in by linking.
         predict: Path to a TSV file for prediction.
         test: Path to a TSV file for testing.
@@ -32,9 +33,10 @@ class DataModule(lightning.LightningDataModule):
 
     def __init__(
         self,
-        *,
-        model_name: str,
         # Paths.
+        *,
+        model_dir: str,
+        model_name: str,
         train=None,
         val=None,
         predict=None,
@@ -47,6 +49,7 @@ class DataModule(lightning.LightningDataModule):
         batch_size: int = defaults.BATCH_SIZE,
     ):
         super().__init__()
+        self.model_dir = model_dir
         self.train = train
         self.val = val
         self.predict = predict
