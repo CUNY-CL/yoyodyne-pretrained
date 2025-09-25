@@ -39,6 +39,7 @@ model:
 data:
   batch_size: 448
   features_col: 3
+  model_dir: /Users/Shinji/conll2017/data/english
   train: /Users/Shinji/conll2017/data/english-train-medium
   val: /Users/Shinji/conll2017/data/english-train-medium
   test: /Users/Shinji/conll2017/data/english-uncovered-test

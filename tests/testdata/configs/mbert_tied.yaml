@@ -1,0 +1,14 @@
+class_path: yoyodyne_pretrained.models.EncoderDecoderModel
+init_args:
+  dropout: .41
+  label_smoothing: .15
+  model_name: google-bert/bert-base-multilingual-cased
+  optimizer:
+    class_path: torch.optim.Adam
+    init_args: 
+      lr: 3.5e-05
+  scheduler:
+    class_path: yoyodyne.schedulers.WarmupInverseSquareRoot
+    init_args:
+      warmup_epochs: 2
+  tie_encoder_decoder: true
