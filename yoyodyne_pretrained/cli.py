@@ -45,11 +45,9 @@ def main() -> None:
     YoyodynePretrainedCLI(
         model_class=models.BaseModel,
         datamodule_class=data.DataModule,
+        save_config_callback=None,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
-        trainer_defaults={
-            "logger": {"class_path": "lightning.pytorch.loggers.CSVLogger"}
-        },
     )
 
 
@@ -58,10 +56,8 @@ def python_interface(args: cli.ArgsType = None) -> None:
     YoyodynePretrainedCLI(
         models.BaseModel,
         data.DataModule,
+        save_config_callback=None,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
-        trainer_defaults={
-            "logger": {"class_path": "lightning.pytorch.loggers.CSVLogger"}
-        },
         args=args,
     )

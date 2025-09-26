@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yoyodyne-pretrained"
-version = "0.1.5"
+version = "0.1.6"
 description = "Small-vocabulary transformer sequence-to-sequence models with warm starts"
 license = { text = "Apache 2.0" }
 readme = "README.md"

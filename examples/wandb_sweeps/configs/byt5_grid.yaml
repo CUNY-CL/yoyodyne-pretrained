@@ -1,4 +1,4 @@
-method: random
+method: bayes
 metric:
   name: val_accuracy
   goal: maximize
@@ -32,4 +32,4 @@ parameters:
     distribution: q_uniform
     q: 16
     min: 16
-    max: 1024
+    max: 512

@@ -12,19 +12,20 @@ Execute the following to create and run the sweep; here `${ENTITY}` and
 In the following example, targeting the English data for the CoNLL-SIGMORPHON
 2017 shared task on morphological generation, we have two separate YAML
 configuration files prepared. The first file,
-[`configs/mbert_grid.yaml`](configs/mbert_grid.yaml), specifies the
-hyperparameter grid (it may also contain constant values, if desired). A similar
-file ([`configs/byt5_grid.yaml`](configs/byt5_grid.yaml)) is available for ByT5.
-The second file, [`configs/tune.yaml`](configs/tune.yaml), specifies any
-constants needed during the sweep, such as trainer arguments or data paths.
+[`configs/byt5_grid.yaml`](configs/byt5_grid.yaml), specifies the hyperparameter
+grid (it may also contain constant values, if desired). The second file,
+[`configs/tune.yaml`](configs/tune.yaml), specifies any constants needed during
+the sweep, such as trainer arguments or data paths.
 
     # Creates a sweep; save the sweep ID as ${SWEEP_ID} for later.
     wandb sweep \
         --entity "${ENTITY}" \
         --project "${PROJECT}" \
-        configs/mbert_grid.yaml
+        configs/byt5_grid.yaml
     # Runs the sweep itself using hyperparameters from the the sweep and
     # additional fixed parameters from a Yoyodyne Pretrained config file.
+    # The --command argument tells the sweep to use Yoyodyne Pretrained rather
+    # than vanilla Yoyodyne.
     yoyodyne_sweep \
         --command "yoyodyne_pretrained" \
         --entity "${ENTITY}" \
@@ -51,16 +52,5 @@ the run's "Overview" on W&B, and then run:
 
 ## Additional tips
 
--   Consider also running Bayesian search (`method: bayes`) instead of random
-    search; see
-    [here](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration#configuration-keys)
-    for more information.
--   When running a sweep you must provide the `--entity`, `--project` and
-    `--sweep_id`; arguments not being tuned should be passed using the
-    `--config` file but note that hyperparameters set by the sweep will override
-    those specified in the `--config`.
--   By default `random` and `bayes` search run indefinitely, until they are
-    killed. To specify a fixed number of samples, provide the `--count`
-    argument.
--   For more information about W&B sweeps, [read
-    here](https://docs.wandb.ai/guides/sweeps).
+- See the [Yoyodyne sweeps documentation
+  here](https://github.com/CUNY-CL/yoyodyne/blob/master/examples/wandb_sweeps/README.md).

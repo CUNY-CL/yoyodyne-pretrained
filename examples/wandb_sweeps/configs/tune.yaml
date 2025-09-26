@@ -1,4 +1,4 @@
-seed_everything: 1995
+seed_everything: 49
 trainer:
   max_epochs: 100
   max_time: 00:06:00:00
