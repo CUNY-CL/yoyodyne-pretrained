@@ -20,7 +20,7 @@ trainer:
       init_args:
         project: unit1
         save_dir: /Users/Shinji/mbert/models
-  precision: bf16-true
+  precision: bf16-mixed
 model:
   class_path: yoyodyne_pretrained.models.T5Model
   init_args:
