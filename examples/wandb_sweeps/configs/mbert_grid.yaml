@@ -1,4 +1,4 @@
-method: random
+method: bayes
 metric:
   name: val_accuracy
   goal: maximize
@@ -21,7 +21,7 @@ parameters:
     value: torch.optim.Adam
   model.init_args.optimizer.init_args.lr:
     distribution: log_uniform_values
-    min: 1.0e-06
+    min: 1.0e-05
     max: 0.001
   model.init_args.scheduler.class_path:
     value: yoyodyne.schedulers.WarmupInverseSquareRoot
@@ -34,4 +34,4 @@ parameters:
     distribution: q_uniform
     q: 16
     min: 16
-    max: 1024
+    max: 512

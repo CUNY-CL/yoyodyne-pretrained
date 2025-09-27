@@ -1,7 +1,7 @@
 seed_everything: 49
 trainer:
   max_epochs: 100
-  max_time: 00:01:00:00
+  max_time: 00:02:00:00
   callbacks:
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor
       init_args:
@@ -14,12 +14,15 @@ trainer:
   logger:
     - class_path: lightning.pytorch.loggers.CSVLogger
       init_args:
-        save_dir: /Users/Shinji/models
+        save_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-mbert
     - class_path: lightning.pytorch.loggers.WandbLogger
       init_args:
-        project: unit1
-        save_dir: /Users/Shinji/models
+        project: yp-mbert
+        save_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-mbert
+checkpoint:
+  save_top_k: 0
 data:
   features_col: 3
-  train: /Users/Shinji/conll2017/english-train-high
-  val: /Users/Shinji/conll2017/english-dev
+  train: /mnt/home/DDN_Copy/cuny/kgorman/yoyodyne-pretrained/tests/testdata/data/train.tsv
+  val: /mnt/home/DDN_Copy/cuny/kgorman/yoyodyne-pretrained/tests/testdata/data/dev.tsv
+  model_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-mbert
