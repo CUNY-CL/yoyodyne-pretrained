@@ -1,10 +1,10 @@
-method: random
+method: bayes
 metric:
   name: val_accuracy
   goal: maximize
 parameters:
   model.class_path:
-    value: yoyodyne_pretrained.models.EncoderDecoderModel
+    value: yoyodyne_pretrained.models.T5Model
   model.init_args.dropout:
     distribution: uniform
     min: 0
@@ -14,12 +14,12 @@ parameters:
     min: 0
     max: 0.2
   model.init_args.model_name:
-    value: google/byt5-small
+    value: google/byt5-base
   model.init_args.optimizer.class_path:
     value: torch.optim.Adam
   model.init_args.optimizer.init_args.lr:
     distribution: log_uniform_values
-    min: 1e-06
+    min: 1.0e-06
     max: 0.001
   model.init_args.scheduler.class_path:
     value: yoyodyne.schedulers.WarmupInverseSquareRoot
@@ -32,4 +32,4 @@ parameters:
     distribution: q_uniform
     q: 16
     min: 16
-    max: 1024
+    max: 512
