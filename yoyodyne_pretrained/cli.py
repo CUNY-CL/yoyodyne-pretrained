@@ -28,11 +28,6 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
             required=False,
         )
         parser.link_arguments("model.init_args.model_name", "data.model_name")
-        parser.link_arguments(
-            "data.model_dir",
-            "trainer.logger.init_args.save_dir",
-            apply_on="instantiate",
-        )
 
 
 def main() -> None:
