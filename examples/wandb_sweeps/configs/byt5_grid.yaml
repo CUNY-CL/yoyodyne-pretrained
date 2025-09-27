@@ -20,6 +20,7 @@ parameters:
   model.init_args.optimizer.init_args.lr:
     distribution: log_uniform_values
     min: 1.0e-05
+    min: 1.0e-06
     max: 0.001
   model.init_args.scheduler.class_path:
     value: yoyodyne.schedulers.WarmupInverseSquareRoot

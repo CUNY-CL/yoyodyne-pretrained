@@ -1,0 +1,28 @@
+seed_everything: 49
+trainer:
+  max_epochs: 100
+  max_time: 00:02:00:00
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+      init_args:
+        logging_interval: epoch
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: val_loss
+        patience: 10
+        verbose: true
+  logger:
+    - class_path: lightning.pytorch.loggers.CSVLogger
+      init_args:
+        save_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-byt5
+    - class_path: lightning.pytorch.loggers.WandbLogger
+      init_args:
+        project: yp-byt5
+        save_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-byt5
+checkpoint:
+  save_top_k: 0
+data:
+  features_col: 3
+  train: /mnt/home/DDN_Copy/cuny/kgorman/yoyodyne-pretrained/tests/testdata/data/train.tsv
+  val: /mnt/home/DDN_Copy/cuny/kgorman/yoyodyne-pretrained/tests/testdata/data/dev.tsv
+  model_dir: /mnt/home/DDN_Copy/cuny/kgorman/models/yp-byt5
