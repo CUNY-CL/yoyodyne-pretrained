@@ -121,3 +121,7 @@ class YoyodynePretrainedTest(unittest.TestCase):
             self.TESTDATA_DIR, f"{arch}_expected.test"
         )
         self.assertFileIdentity(evaluation_path, expected_path)
+
+
+if __name__ == "__main__":
+    unittest.main()
