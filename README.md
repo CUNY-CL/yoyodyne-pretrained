@@ -106,128 +106,25 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
 
 #### Optimization
 
-Yoyodyne Pretrained requires an optimizer and an learning rate scheduler. The
-default optimizer is
-[`torch.optim.Adam`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html),
-and the default scheduler is the inherited
-[`yoyodyne.schedulers.Dummy`](https://github.com/CUNY-CL/yoyodyne/blob/d554eb891ac16a4cb741c507abc5e810321b7241/yoyodyne/schedulers.py#L9),
-which keeps learning rate fixed at its initial value and takes no explicit
-configuration arguments.
-
-The following YAML snippet shows the use of the Adam optimizer with a
-non-default initial learning rate and the inherited
-[`yoyodyne.schedulers.WarmupInverseSquareRoot`](https://github.com/CUNY-CL/yoyodyne/blob/d554eb891ac16a4cb741c507abc5e810321b7241/yoyodyne/schedulers.py#L26)
-LR scheduler:
-
-    ...
-    model:
-        ...
-        optimizer:
-          class_path: torch.optim.Adam
-          init_args:
-            lr: 1.0e-5
-        scheduler:
-          class_path: yoyodyne.schedulers.WarmupInverseSquareRoot
-          init_args:
-            warmup_epochs: 10
-        ...
+Yoyodyne Pretrained requires an optimizer and a learning rate scheduler. The
+system is borrowed from Yoyodyne; [see here for more
+information](https://github.com/CUNY-CL/yoyodyne/blob/master/README.md#optimization).
 
 #### Checkpointing
 
-The
-[`ModelCheckpoint`](https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.ModelCheckpoint.html)
-is used to control the generation of checkpoint files:
-
-    ...
-    checkpoint:
-      filename: "model-{epoch:03d}-{val_accuracy:.4f}"
-      mode: max
-      monitor: val_accuracy
-      verbose: true
-      ...
-
-Alternatively, one can specify a checkpointing that minimizes validation loss,
-as follows:
-
-    ...
-    checkpoint:
-      filename: "model-{epoch:03d}-{val_loss:.4f}"
-      mode: min
-      monitor: val_loss
-      verbose: true
-      ...
-
-A checkpoint config must be specified or Yoyodyne Pretrained will not generate
-any checkpoints.
+A checkpoint config must be specified or no checkpoints will be generated; [see
+here for more
+information](https://github.com/CUNY-CL/yoyodyne/blob/master/README.md#checkpointing).
 
 #### Callbacks
 
-The user will likely want to configure additional callbacks. Some useful
-examples are given below.
-
-The
-[`LearningRateMonitor`](https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.LearningRateMonitor.html)
-callback records learning rates:
-
-    ...
-    trainer:
-      callbacks:
-      - class_path: lightning.pytorch.callbacks.LearningRateMonitor
-        init_args:
-          logging_interval: epoch
-      ...
-
-The
-[`EarlyStopping`](https://lightning.ai/docs/pytorch/stable/common/early_stopping.html)
-callback enables early stopping based on a monitored quantity and a fixed
-`patience`:
-
-    ...
-    trainer:
-      callbacks:
-      - class_path: lightning.pytorch.callbacks.EarlyStopping
-        init_args:
-          monitor: val_loss
-          patience: 10
-          verbose: true
-      ...
+[See here for more
+information](https://github.com/CUNY-CL/yoyodyne/blob/master/README.md#callbacks).
 
 #### Logging
 
-By default, Yoyodyne Pretrained performs some minimal logging to standard error
-and uses progress bars to keep track of progress during each epoch. However, one
-can enable additional logging faculties during training, using a similar syntax
-to the one we saw above for callbacks.
-
-The
-[`CSVLogger`](https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.CSVLogger.html)
-logs all monitored quantities to a CSV file. A sample configuration is given
-below.
-
-    ...
-    trainer:
-      logger:
-        - class_path: lightning.pytorch.loggers.CSVLogger
-          init_args:
-            save_dir: /Users/Shinji/models
-      ...
-
-The
-[`WandbLogger`](https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.WandbLogger.html)
-works similarly to the `CSVLogger`, but sends the data to the third-party
-website [Weights & Biases](https://wandb.ai/site), where it can be used to
-generate charts or share artifacts. A sample configuration is given below.
-
-    ...
-    trainer:
-      logger:
-      - class_path: lightning.pytorch.loggers.WandbLogger
-        init_args:
-          project: unit1
-          save_dir: /Users/Shinji/models
-      ...
-
-Note that this functionality requires a working account with Weights & Biases.
+[See here for more
+information](https://github.com/CUNY-CL/yoyodyne/blob/master/README.md#logging).
 
 #### Other options
 
