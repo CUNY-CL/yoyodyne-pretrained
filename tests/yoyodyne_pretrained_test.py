@@ -6,6 +6,7 @@ See testdata/data for code for regenerating data and accuracy/loss statistics.
 import contextlib
 import difflib
 import os
+import re
 import tempfile
 import unittest
 
@@ -26,16 +27,21 @@ class YoyodynePretrainedTest(unittest.TestCase):
             open(actual_path, "r") as actual,
             open(expected_path, "r") as expected,
         ):
-            diff = list(
+            difflines = "".join(
                 difflib.unified_diff(
-                    actual.readlines(),
-                    expected.readlines(),
+                    [self._normalize(line) for line in actual],
+                    [self._normalize(line) for line in expected],
                     fromfile=actual_path,
                     tofile=expected_path,
                     n=1,
                 )
             )
-        self.assertEqual(diff, [], f"Prediction differences found:\n{diff}")
+            if difflines:
+                self.fail(f"Prediction differences found:\n{difflines}")
+
+    @staticmethod
+    def _normalize(line: str) -> str:
+        return re.sub(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])", "", line)
 
     def setUp(self):
         self.tempdir = tempfile.TemporaryDirectory(

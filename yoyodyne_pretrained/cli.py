@@ -37,7 +37,7 @@ class YoyodynePretrainedCLI(cli.LightningCLI):
 
 def main() -> None:
     logging.basicConfig(
-        format="%(filename)s %(levelname)s: %(asctime)s - %(message)s",
+        format="%(levelname)s: %(asctime)s - %(message)s",
         datefmt="%d-%b-%y %H:%M:%S",
         level="INFO",
     )
