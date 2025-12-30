@@ -100,17 +100,18 @@ the following YAML snippet:
       init_args:
         model_name: google-bert/bert-base-multilingual-cased
         tie_encoder_decoder: true
-        ...
+    ...
 
 ##### T5 models
 
 The following snippet shows a simple configuration T5 configuration using ByT5:
 
+      ...
       class_path: yoyodyne_pretrained.models.T5Model
       init_args:
         model_name: google/byt5-base
         tie_encoder_decoder: true
-        ...
+      ...
 
 #### Optimization
 
@@ -143,7 +144,7 @@ Dropout probability and/or label smoothing are specified as arguments to the
     model:
       dropout: 0.5
       label_smoothing: 0.1
-      ...
+    ...
 
 Decoding is performed with beam search if `model: num_beams: ...` is set to a
 value greater than 1; the beam width ("number of beams") defaults to 5.
@@ -164,7 +165,7 @@ epochs or 6 wall-clock hours, whichever comes first.
     trainer:
       max_epochs: 100
       max_time: 00:06:00:00
-      ...
+    ...
 
 ### Validation (`validate`)
 
