@@ -48,10 +48,13 @@ Colab](https://colab.research.google.com/) GPU runtimes.
 
 ## File formats
 
-Other than YAML configuration files, Yoyodyne Pretrained operates on basic
-tab-separated values (TSV) data files. The user can specify source, features,
-and target columns. If a feature column is specified, it is concatenated (with a
-separating space) to the source.
+### YAML configuration files
+
+Yoyodyne Pretrained uses YAML configuration files; see the [exapmle configuration files](configs) for  examples, and see the [Yoyodyne documentation](https://github.com/CUNY-CL/yoyodyne?tab=readme-ov-file#variable-interpolation) for information on variable interpolation.
+
+### TSV data files
+
+Yoyodyne Pretrained operates on basic tab-separated values (TSV) data files. The user can specify source, features, and target columns. If a feature column is specified, it is concatenated (with a separating space) to the source.
 
 ## Usage
 

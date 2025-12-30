@@ -43,8 +43,9 @@ def main() -> None:
     )
     # Select the model.
     YoyodynePretrainedCLI(
-        model_class=models.BaseModel,
-        datamodule_class=data.DataModule,
+        models.BaseModel,
+        data.DataModule,
+        parser_kwargs={"parser_mode": "omegaconf"},
         save_config_callback=None,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
@@ -56,6 +57,7 @@ def python_interface(args: cli.ArgsType = None) -> None:
     YoyodynePretrainedCLI(
         models.BaseModel,
         data.DataModule,
+        parser_kwargs={"parser_mode": "omegaconf"},
         save_config_callback=None,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
