@@ -50,7 +50,7 @@ Colab](https://colab.research.google.com/) GPU runtimes.
 
 ### YAML configuration files
 
-Yoyodyne Pretrained uses YAML configuration files; see the [exapmle
+Yoyodyne Pretrained uses YAML configuration files; see the [example
 configuration files](configs) for examples, and see the [Yoyodyne
 documentation](https://github.com/CUNY-CL/yoyodyne?tab=readme-ov-file#variable-interpolation)
 for information on variable interpolation.
