@@ -60,15 +60,21 @@ class DataModule(lightning.LightningDataModule):
             target_col=target_col,
         )
         self.batch_size = batch_size
-        self.tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
+        self.collator = collators.Collator(
+            transformers.AutoTokenizer.from_pretrained(model_name)
+        )
 
     # Required API.
+
+    # The training set uses the mappable dataset because of shuffling, and
+    # the validation set uses it because it is accesssed repeatedly under
+    # normal conditions. Other dataloaders use the iterable dataset.
 
     def train_dataloader(self) -> data.DataLoader:
         assert self.train is not None, "no train path"
         return data.DataLoader(
-            self._dataset(self.train),
-            collate_fn=self._collate_fn,
+            datasets.MappableDataset(self.train, self.parser),
+            collate_fn=self.collator,
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=1,
@@ -78,8 +84,8 @@ class DataModule(lightning.LightningDataModule):
     def val_dataloader(self) -> data.DataLoader:
         assert self.val is not None, "no val path"
         return data.DataLoader(
-            self._dataset(self.val),
-            collate_fn=self._collate_fn,
+            datasets.MappableDataset(self.val, self.parser),
+            collate_fn=self.collator,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=1,
@@ -89,8 +95,8 @@ class DataModule(lightning.LightningDataModule):
     def predict_dataloader(self) -> data.DataLoader:
         assert self.predict is not None, "no predict path"
         return data.DataLoader(
-            self._dataset(self.predict),
-            collate_fn=self._collate_fn,
+            datasets.IterableDataset(self.predict, self.parser),
+            collate_fn=self.collator,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=1,
@@ -100,19 +106,10 @@ class DataModule(lightning.LightningDataModule):
     def test_dataloader(self) -> data.DataLoader:
         assert self.test is not None, "no test path"
         return data.DataLoader(
-            self._dataset(self.test),
-            collate_fn=self._collate_fn,
+            datasets.IterableDataset(self.test, self.parser),
+            collate_fn=self.collator,
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=1,
             persistent_workers=True,
         )
-
-    def _dataset(self, path: str) -> datasets.Dataset:
-        return datasets.Dataset(
-            list(self.parser.samples(path)),
-        )
-
-    @property
-    def _collate_fn(self) -> collators.Collator:
-        return collators.Collator(self.tokenizer)

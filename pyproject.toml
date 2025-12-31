@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yoyodyne-pretrained"
-version = "0.1.8"
+version = "0.1.9"
 description = "Small-vocabulary transformer sequence-to-sequence models with warm starts"
 license = { text = "Apache 2.0" }
 readme = "README.md"
@@ -38,7 +38,7 @@ dependencies = [
     "torch==2.9.1",
     "torchmetrics==1.8.2",
     "transformers>=4.44.0,<5.0.0",
-    "yoyodyne>=0.4.9",
+    "yoyodyne>=0.5.0",
 ]
 
 [project.scripts]
