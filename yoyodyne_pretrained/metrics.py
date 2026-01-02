@@ -1,8 +1,7 @@
 """Validation metrics.
 
 The computation of loss is built into the models. A slight modification of
-a built-in class from torchmetrics is used to compute exact match accuracy. A
-novel symbol error rate (SER) implementation is also provided.
+a built-in class from torchmetrics is used to compute exact match accuracy.
 
 Adding additional metrics is relatively easy, though there are a lot of steps.
 Suppose one wants to add a metric called Wham. Then one must:
@@ -42,6 +41,7 @@ Suppose one wants to add a metric called Wham. Then one must:
 """
 
 import torch
+from torch import nn
 import torchmetrics
 
 
@@ -83,9 +83,14 @@ class Accuracy(torchmetrics.classification.MulticlassExactMatch):
                 "Hypothesis and gold batch sizes do not match "
                 f"({gold.size(0)} != {hypo.size(0)})"
             )
-        # Shrink to the smaller of the two. It won't match anyways.
-        if hypo.size(1) < gold.size(1):
-            gold = gold[:, : hypo.size(1)]
-        elif hypo.size(1) > gold.size(1):
-            hypo = hypo[:, : gold.size(1)]
+        if hypo.size(1) != gold.size(1):
+            max_len = max(hypo.size(1), gold.size(1))
+            if hypo.size(1) < max_len:
+                hypo = nn.functional.pad(
+                    hypo, (0, max_len - hypo.size(1)), value=self.ignore_index
+                )
+            if gold.size(1) < max_len:
+                gold = nn.functional.pad(
+                    gold, (0, max_len - gold.size(1)), value=self.ignore_index
+                )
         super().update(hypo, gold)
