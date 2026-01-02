@@ -1,10 +1,6 @@
 """TSV parsing.
 
-Adapted from Yoyodyne:
-
-    https://github.com/CUNY-CL/yoyodyne/blob/master/yoyodyne/data/tsv.py
-
-Most of the features of the TsvParser can be quickly simplified however.
+The TsvParser yields data from TSV files using 1-based indexing.
 """
 
 import csv
@@ -27,8 +23,10 @@ class TsvParser:
 
     Args:
         source_col: 1-indexed column in TSV containing source strings.
-        features_col: 1-indexed column in TSV containing features strings.
-        target_col: 1-indexed column in TSV containing target strings.
+        features_col: 1-indexed column in TSV containing features strings;
+            0 indicates no features column is present.
+        target_col: 1-indexed column in TSV containing target strings; 0
+            indicates no target column is present.
     """
 
     source_col: int = defaults.SOURCE_COL
@@ -44,10 +42,33 @@ class TsvParser:
         if self.target_col < 0:
             raise Error(f"Out of range target column: {self.target_col}")
 
-    @staticmethod
-    def _tsv_reader(path: str) -> Iterator[str]:
-        with open(path, "r", encoding=defaults.ENCODING) as tsv:
-            yield from csv.reader(tsv, delimiter="\t")
+    def parse_line(self, line: str) -> SampleType:
+        """Parses a single TSV line string."""
+        reader = csv.reader([line], delimiter="\t")
+        try:
+            row = next(reader)
+        except StopIteration:
+            raise Error("Empty line encountered")
+        return self._row_to_sample(row)
+
+    def samples(self, path: str) -> Iterator[SampleType]:
+        """Yields source, and target if available."""
+        with open(path, "r", encoding=defaults.ENCODING) as source:
+            for row in csv.reader(source, delimiter="\t"):
+                yield self._row_to_sample(row)
+
+    def _row_to_sample(self, row: list[str]) -> SampleType:
+        """Internal helper to convert a row to a SampleType."""
+        source = self._get_string(row, self.source_col)
+        if self.has_features:
+            features = self._get_string(row, self.features_col)
+            # Concatenates features after the source.
+            source = f"{source} {features}"
+        if self.has_target:
+            target = self._get_string(row, self.target_col)
+            return source, target
+        else:
+            return source
 
     @staticmethod
     def _get_string(row: list[str], col: int) -> str:
@@ -69,17 +90,3 @@ class TsvParser:
     @property
     def has_target(self) -> bool:
         return self.target_col != 0
-
-    def samples(self, path: str) -> Iterator[SampleType]:
-        """Yields source, and features and/or target if available."""
-        for row in self._tsv_reader(path):
-            source = self._get_string(row, self.source_col)
-            if self.has_features:
-                features = self._get_string(row, self.features_col)
-                # Concatenates features after the source.
-                source = f"{source} {features}"
-            if self.has_target:
-                target = self._get_string(row, self.target_col)
-                yield source, target
-            else:
-                yield source
