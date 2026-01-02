@@ -33,7 +33,7 @@ class IterableDataset(AbstractDataset, data.IterableDataset):
 
 
 @dataclasses.dataclass
-class MappableDataset(AbstractDataset):
+class MappableDataset(AbstractDataset, data.Dataset):
     """Mappable (random access) dataset.
 
     This is implemented with a memory map after making a single pass through
