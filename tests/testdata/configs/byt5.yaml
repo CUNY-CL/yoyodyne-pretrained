@@ -1,7 +1,6 @@
 class_path: yoyodyne_pretrained.models.T5Model
 init_args:
   dropout: 0.28688
-  label_smoothing: 0.145
   model_name: google/byt5-base
   optimizer:
     class_path: torch.optim.Adam

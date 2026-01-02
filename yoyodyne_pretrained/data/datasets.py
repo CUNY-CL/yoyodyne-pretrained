@@ -67,13 +67,13 @@ class MappableDataset(data.Dataset):
         return len(self._offsets)
 
     def __getitem__(self, idx: int) -> tsv.SampleType:
-        mmap = self._get_mmap()
+        mm = self._get_mmap()
         start = self._offsets[idx]
         if idx + 1 < len(self._offsets):
             end = self._offsets[idx + 1]
         else:
-            end = mmap.size()
-        line = mmap[start:end].decode(defaults.ENCODING).rstrip()
+            end = mm.size()
+        line = mm[start:end].decode(defaults.ENCODING).rstrip()
         return self.parser.parse_line(line)
 
     def __del__(self) -> None:

@@ -42,7 +42,9 @@ class BaseModel(lightning.LightningModule):
 
     def forward(self, batch: data.Batch) -> torch.Tensor:
         return self.model(
-            batch.source, attention_mask=batch.source_mask, labels=batch.target
+            batch.source,
+            attention_mask=batch.source_mask,
+            labels=batch.target,
         ).loss
 
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
@@ -134,7 +136,6 @@ class EncoderDecoderModel(BaseModel):
         encoder: Name of the Hugging Face encoder model.
         decoder: Name of the Hugging Face decoder model.
         dropout: Dropout probability.
-        label_smoothing: Label smoothing probability.
         num_beams: Width of the beam to use during decoding.
     """
 
@@ -145,7 +146,6 @@ class EncoderDecoderModel(BaseModel):
         *,
         model_name="google-bert/bert-base-multilingual-cased",
         dropout=defaults.DROPOUT,
-        label_smoothing=defaults.LABEL_SMOOTHING,
         tie_encoder_decoder=True,
         num_beams=defaults.NUM_BEAMS,
         compute_accuracy=True,
@@ -153,13 +153,14 @@ class EncoderDecoderModel(BaseModel):
         scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
     ):
         super().__init__()
+        self.dropout = dropout
         self.model = (
             transformers.EncoderDecoderModel.from_encoder_decoder_pretrained(
                 model_name,
                 model_name,
                 tie_encoder_decoder=tie_encoder_decoder,
-                encoder_hidden_dropout_prob=dropout,
-                decoder_hidden_dropout_prob=dropout,
+                encoder_hidden_dropout_prob=self.dropout,
+                decoder_hidden_dropout_prob=self.dropout,
             )
         )
         # Necessary patching for decoding.
@@ -204,7 +205,6 @@ class T5Model(BaseModel):
 
     Args:
         dropout: Dropout probability.
-        label_smoothing: Label smoothing probability.
         model_name: Name of the Hugging Face T5 model.
         num_beams: Width of the beam to use during decoding.
     """
@@ -216,21 +216,21 @@ class T5Model(BaseModel):
         *,
         model_name="google/byt5-base",
         dropout=defaults.DROPOUT,
-        label_smoothing=defaults.LABEL_SMOOTHING,
         num_beams=defaults.NUM_BEAMS,
         compute_accuracy=True,
         optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
         scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
     ):
         super().__init__()
+        self.dropout = dropout
         self.model = transformers.AutoModelForSeq2SeqLM.from_pretrained(
-            model_name, dropout_rate=dropout
+            model_name, dropout_rate=self.dropout
         )
         # BOS is apparently not used.
         eos = self.model.config.eos_token_id
         pad = self.model.config.pad_token_id
         self.model.config.decoder_start_token_id = pad
-        target_vocab_size = self.model.get_decoder().embed_tokens.embedding_dim
+        target_vocab_size = self.model.config.vocab_size
         self.accuracy = (
             metrics.Accuracy(ignore_index=pad, num_classes=target_vocab_size)
             if compute_accuracy
