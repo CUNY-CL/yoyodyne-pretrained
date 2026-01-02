@@ -1,7 +1,6 @@
 class_path: yoyodyne_pretrained.models.EncoderDecoderModel
 init_args:
   dropout: 0.20341
-  label_smoothing: 0.094877
   model_name: google-bert/bert-base-multilingual-cased
   optimizer:
     class_path: torch.optim.Adam
