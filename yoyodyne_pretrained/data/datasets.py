@@ -26,7 +26,7 @@ class AbstractDataset(abc.ABC):
 
 @dataclasses.dataclass
 class IterableDataset(AbstractDataset, data.IterableDataset):
-    """Iterable (non-random access) data set."""
+    """Iterable (non-random access) dataset."""
 
     def __iter__(self) -> Iterator[tsv.SampleType]:
         yield from self.parser.samples(self.path)
@@ -34,10 +34,11 @@ class IterableDataset(AbstractDataset, data.IterableDataset):
 
 @dataclasses.dataclass
 class MappableDataset(data.Dataset):
-    """Mappable (random access) data set.
+    """Mappable (random access) dataset.
 
     This is implemented with a memory map after making a single pass through
-    the file to compute offsets."""
+    the file to compute offsets.
+    """
 
     _offsets: list[int] = dataclasses.field(default_factory=list, init=False)
     _mmap: mmap.mmap | None = dataclasses.field(default=None, init=False)
@@ -67,13 +68,13 @@ class MappableDataset(data.Dataset):
         return len(self._offsets)
 
     def __getitem__(self, idx: int) -> tsv.SampleType:
-        mmap = self._get_mmap()
+        mm = self._get_mmap()
         start = self._offsets[idx]
         if idx + 1 < len(self._offsets):
             end = self._offsets[idx + 1]
         else:
-            end = mmap.size()
-        line = mmap[start:end].decode(defaults.ENCODING).rstrip()
+            end = mm.size()
+        line = mm[start:end].decode(defaults.ENCODING).rstrip()
         return self.parser.parse_line(line)
 
     def __del__(self) -> None:
