@@ -47,6 +47,12 @@ class BaseModel(lightning.LightningModule):
             labels=batch.target,
         ).loss
 
+    def on_fit_start(self) -> None:
+        # Rather than crashing, we simply warn about lack of deterministic
+        # algorithms.
+        if torch.are_deterministic_algorithms_enabled():
+            torch.use_deterministic_algorithms(True, warn_only=True)
+
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
         return self._decode(batch.source, batch.source_mask)
 
