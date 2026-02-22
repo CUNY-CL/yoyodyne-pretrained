@@ -84,7 +84,7 @@ class DataModule(lightning.LightningDataModule):
     def val_dataloader(self) -> data.DataLoader:
         assert self.val is not None, "no val path"
         return data.DataLoader(
-            datasets.MappableDataset(self.val, self.parser),
+            datasets.MappableDataset(self.val, self.parser, sequential=True),
             collate_fn=self.collator,
             batch_size=self.batch_size,
             shuffle=False,
