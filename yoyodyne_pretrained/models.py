@@ -5,6 +5,7 @@ from lightning.pytorch import cli
 import torch
 from torch import optim
 import transformers
+import wandb
 
 from . import data, defaults, metrics
 
@@ -52,6 +53,11 @@ class BaseModel(lightning.LightningModule):
         # algorithms.
         if torch.are_deterministic_algorithms_enabled():
             torch.use_deterministic_algorithms(True, warn_only=True)
+        # Informs W&B how I want key metrics summarized.
+        if wandb.run is not None:
+            wandb.define_metric("train_loss", summary="min")
+            wandb.define_metric("val_accuracy", summary="max")
+            wandb.define_metric("val_loss", summary="min")
 
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
         return self._decode(batch.source, batch.source_mask)
@@ -82,14 +88,15 @@ class BaseModel(lightning.LightningModule):
 
     def validation_step(self, batch: data.Batch, batch_idx: int) -> None:
         loss = self(batch)
-        self.log(
-            "val_loss",
-            loss,
-            batch_size=len(batch),
-            logger=True,
-            on_epoch=True,
-            prog_bar=True,
-        )
+        if not self.trainer.sanity_checking:
+            self.log(
+                "val_loss",
+                loss,
+                batch_size=len(batch),
+                logger=True,
+                on_epoch=True,
+                prog_bar=True,
+            )
         self._update_metrics(batch)
 
     def on_validation_epoch_end(self) -> None:
