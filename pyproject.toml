@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "yoyodyne-pretrained"
 version = "0.1.11"
 description = "Small-vocabulary transformer sequence-to-sequence models with warm starts"
-license = { text = "Apache 2.0" }
+license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
 authors = [
@@ -26,7 +26,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Development Status :: 4 - Beta",
     "Environment :: Console",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Topic :: Text Processing :: Linguistic",
 ]
