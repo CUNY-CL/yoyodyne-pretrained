@@ -58,6 +58,8 @@ class BaseModel(lightning.LightningModule):
             wandb.define_metric("train_loss", summary="min")
             wandb.define_metric("val_accuracy", summary="max")
             wandb.define_metric("val_loss", summary="min")
+        # Ensures the underlying model is in training mode.
+        self.model.train()
 
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
         return self._decode(batch.source, batch.source_mask)
