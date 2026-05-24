@@ -96,7 +96,8 @@ class MappableDataset(AbstractDataset, data.Dataset):
             end = self._offsets[idx + 1]
         else:
             end = mm.size()
-        line = mm[start:end].decode(defaults.ENCODING).rstrip()
+        # Preserves non-line-ending trailing whitespace.
+        line = mm[start:end].decode(defaults.ENCODING).rstrip("\r\n")
         return self.parser.parse_line(line)
 
     def __del__(self) -> None:
