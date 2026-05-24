@@ -3,7 +3,7 @@
 import logging
 
 from lightning.pytorch import callbacks as pytorch_callbacks, cli
-from yoyodyne import trainers
+from yoyodyne import callbacks as yoyodyne_callbacks, trainers
 
 from . import callbacks, data, models
 
@@ -41,19 +41,15 @@ def main() -> None:
         datefmt="%d-%b-%y %H:%M:%S",
         level="INFO",
     )
-    # Select the model.
-    YoyodynePretrainedCLI(
-        models.BaseModel,
-        data.DataModule,
-        parser_kwargs={"parser_mode": "omegaconf"},
-        save_config_callback=None,
-        subclass_mode_model=True,
-        trainer_class=trainers.Trainer,
-    )
+    _run_cli()
 
 
-def python_interface(args: cli.ArgsType = None) -> None:
+def python_interface(args: cli.ArgsType | None = None) -> None:
     """Interface to use models through Python."""
+    return _run_cli(args)
+
+
+def _run_cli(args: cli.ArgsType | None = None) -> None:
     YoyodynePretrainedCLI(
         models.BaseModel,
         data.DataModule,
@@ -61,5 +57,9 @@ def python_interface(args: cli.ArgsType = None) -> None:
         save_config_callback=None,
         subclass_mode_model=True,
         trainer_class=trainers.Trainer,
+        trainer_defaults={
+            "callbacks": [yoyodyne_callbacks.CompactModelSummary()],
+            "enable_model_summary": False,
+        },
         args=args,
     )
