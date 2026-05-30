@@ -110,7 +110,6 @@ The following snippet shows a simple configuration T5 configuration using ByT5:
       class_path: yoyodyne_pretrained.models.T5Model
       init_args:
         model_name: google/byt5-base
-        tie_encoder_decoder: true
       ...
 
 #### Optimization
