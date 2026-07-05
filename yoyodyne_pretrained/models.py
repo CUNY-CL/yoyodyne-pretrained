@@ -1,9 +1,13 @@
 """Models."""
 
+import contextlib
+from typing import Iterator
+
 import lightning
 from lightning.pytorch import cli
 import torch
 from torch import optim
+from torch.utils import flop_counter
 import transformers
 import wandb
 
@@ -24,6 +28,7 @@ class BaseModel(lightning.LightningModule):
 
     # TODO: update with new metrics as they become available.
     accuracy: metrics.Accuracy | None
+    flop: flop_counter.FlopCounterMode | None
     generation_config: transformers.GenerationConfig
     optimizer: optim.Optimizer
     scheduler: optim.lr_scheduler.LRScheduler
@@ -41,12 +46,26 @@ class BaseModel(lightning.LightningModule):
     def has_accuracy(self) -> bool:
         return self.accuracy is not None
 
+    @property
+    def has_flop(self) -> bool:
+        return self.flop is not None
+
     def forward(self, batch: data.Batch) -> torch.Tensor:
         return self.model(
             batch.source,
             attention_mask=batch.source_mask,
             labels=batch.target,
         ).loss
+
+    @contextlib.contextmanager
+    def flop_profiler(self) -> Iterator[None]:
+        context = (
+            self.flop
+            if self.has_flop and self.current_epoch == 0
+            else contextlib.nullcontext()
+        )
+        with context:
+            yield
 
     def on_fit_start(self) -> None:
         # Rather than crashing, we simply warn about lack of deterministic
@@ -61,11 +80,25 @@ class BaseModel(lightning.LightningModule):
         # Ensures the underlying model is in training mode.
         self.model.train()
 
+    def on_train_epoch_end(self) -> None:
+        if self.has_flop and self.current_epoch == 0:
+            self.log(
+                "train_gflop",
+                self.flop.get_total_flops() / 1e9,
+                logger=True,
+                on_epoch=True,
+                on_step=False,
+            )
+            # We null this to free memory and ensure it's not called on
+            # subsequent epochs.
+            self.flop = None
+
     def predict_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
         return self._decode(batch.source, batch.source_mask)
 
     def training_step(self, batch: data.Batch, batch_idx: int) -> torch.Tensor:
-        loss = self(batch)
+        with self.flop_profiler():
+            loss = self(batch)
         self.log(
             "train_loss",
             loss,
@@ -148,6 +181,8 @@ class EncoderDecoderModel(BaseModel):
         Association for Computational Linguistics 8: 264-280.
 
     Args:
+        compute_accuracy: Should accuracy be computed?
+        compute_gflop: Should training GFLOP be computed?
         encoder: Name of the Hugging Face encoder model.
         decoder: Name of the Hugging Face decoder model.
         dropout: Dropout probability.
@@ -159,11 +194,12 @@ class EncoderDecoderModel(BaseModel):
     def __init__(
         self,
         *,
+        compute_accuracy=True,
+        compute_gflop=False,
         model_name="google-bert/bert-base-multilingual-cased",
         dropout=defaults.DROPOUT,
         tie_encoder_decoder=True,
         num_beams=defaults.NUM_BEAMS,
-        compute_accuracy=True,
         optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
         scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
     ):
@@ -195,6 +231,11 @@ class EncoderDecoderModel(BaseModel):
             if compute_accuracy
             else None
         )
+        self.flop = (
+            flop_counter.FlopCounterMode(display=False)
+            if compute_gflop
+            else None
+        )
         self.generation_config = transformers.GenerationConfig(
             decoder_start_token_id=bos,
             bos_token_id=bos,
@@ -219,6 +260,8 @@ class T5Model(BaseModel):
         Learning Research 21: 1-67.
 
     Args:
+        compute_accuracy: Should accuracy be computed?
+        compute_gflop: Should training GFLOP be computed?
         dropout: Dropout probability.
         model_name: Name of the Hugging Face T5 model.
         num_beams: Width of the beam to use during decoding.
@@ -229,10 +272,11 @@ class T5Model(BaseModel):
     def __init__(
         self,
         *,
-        model_name="google/byt5-base",
-        dropout=defaults.DROPOUT,
-        num_beams=defaults.NUM_BEAMS,
         compute_accuracy=True,
+        compute_gflop=False,
+        dropout=defaults.DROPOUT,
+        model_name="google/byt5-base",
+        num_beams=defaults.NUM_BEAMS,
         optimizer: cli.OptimizerCallable = defaults.OPTIMIZER,
         scheduler: cli.LRSchedulerCallable = defaults.SCHEDULER,
     ):
@@ -249,6 +293,11 @@ class T5Model(BaseModel):
         self.accuracy = (
             metrics.Accuracy(ignore_index=pad, num_classes=target_vocab_size)
             if compute_accuracy
+            else None
+        )
+        self.flop = (
+            flop_counter.FlopCounterMode(display=False)
+            if compute_gflop
             else None
         )
         self.generation_config = transformers.GenerationConfig(

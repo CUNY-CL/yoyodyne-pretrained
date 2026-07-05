@@ -1,5 +1,6 @@
 class_path: yoyodyne_pretrained.models.EncoderDecoderModel
 init_args:
+  compute_gflop: true
   dropout: 0.20341
   model_name: google-bert/bert-base-multilingual-cased
   optimizer:
